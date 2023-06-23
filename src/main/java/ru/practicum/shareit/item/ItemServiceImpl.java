@@ -12,6 +12,7 @@ import ru.practicum.shareit.user.model.User;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -39,7 +40,7 @@ public class ItemServiceImpl implements ItemService {
                     itemId, itemDto.getId()));
         Item item = ItemMapper.toItem(user, itemDto);
         Item oldItem = get(item.getOwner().getId(), itemId);
-        if (item.getOwner().getId() != oldItem.getOwner().getId())
+        if (!Objects.equals(item.getOwner().getId(), oldItem.getOwner().getId()))
             throw new IncompatibleUserIdException("id пользователей не совпадают.");
         return itemRepository.update(item, oldItem);
     }
