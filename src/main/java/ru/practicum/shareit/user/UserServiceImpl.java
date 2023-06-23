@@ -27,7 +27,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public User get(long userId) {
         User user = userRepository.find(userId);
-        if(user == null)
+        if (user == null)
             throw new UserNotFoundException(String.format("Пользователь с id %s не найден.", userId));
         return user;
     }

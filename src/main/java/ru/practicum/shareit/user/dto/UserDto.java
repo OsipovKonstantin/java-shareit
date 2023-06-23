@@ -10,7 +10,7 @@ import javax.validation.constraints.NotNull;
 
 @Data
 @Builder
-@EqualsAndHashCode(of="email")
+@EqualsAndHashCode(of = "email")
 public class UserDto {
     private Long id;
     @NotBlank
