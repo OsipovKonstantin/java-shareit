@@ -29,12 +29,12 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public Item update(Long userId, Long itemId, ItemDto itemDto) {
+    public Item update(long userId, long itemId, ItemDto itemDto) {
         User user = userService.get(userId);
 
         if (itemDto.getId() == null)
             itemDto.setId(itemId);
-        if (!itemId.equals(itemDto.getId()))
+        if (itemId != itemDto.getId())
             throw new IncompatibleItemIdException(String.format("id предметов %s и %s не совпадают.",
                     itemId, itemDto.getId()));
         Item item = ItemMapper.toItem(user, itemDto);
