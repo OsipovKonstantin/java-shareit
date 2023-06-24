@@ -8,9 +8,6 @@ import javax.validation.Valid;
 import java.util.List;
 import java.util.stream.Collectors;
 
-/**
- * TODO Sprint add-controllers.
- */
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/items")
@@ -30,8 +27,8 @@ public class ItemController {
     }
 
     @GetMapping("/{itemId}")
-    public ItemDto get(@RequestHeader("X-Sharer-User-Id") long userId, @PathVariable long itemId) {
-        return ItemMapper.toItemDto(itemService.get(userId, itemId));
+    public ItemDto get(@PathVariable long itemId) {
+        return ItemMapper.toItemDto(itemService.get(itemId));
     }
 
     @GetMapping

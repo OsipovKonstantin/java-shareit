@@ -33,7 +33,7 @@ public class ItemRepositoryImpl implements ItemRepository {
     }
 
     @Override
-    public Item get(long userId, long itemId) {
+    public Item get(long itemId) {
         return items.get(itemId);
     }
 

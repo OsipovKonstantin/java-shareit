@@ -39,15 +39,15 @@ public class ItemServiceImpl implements ItemService {
             throw new IncompatibleItemIdException(String.format("id предметов %s и %s не совпадают.",
                     itemId, itemDto.getId()));
         Item item = ItemMapper.toItem(user, itemDto);
-        Item oldItem = get(item.getOwner().getId(), itemId);
+        Item oldItem = get(itemId);
         if (!Objects.equals(item.getOwner().getId(), oldItem.getOwner().getId()))
             throw new IncompatibleUserIdException("id пользователей не совпадают.");
         return itemRepository.update(item, oldItem);
     }
 
     @Override
-    public Item get(long userId, long itemId) {
-        Item item = itemRepository.get(userId, itemId);
+    public Item get(long itemId) {
+        Item item = itemRepository.get(itemId);
         if (item == null)
             throw new ItemNotFoundException(String.format("Предмет с id %s не найден.", itemId));
         return item;
