@@ -11,6 +11,55 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice("ru.practicum.shareit")
 public class ErrorHandler {
 
+    @ExceptionHandler(UserNotBookedBeforeException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handleUserNotBookedBeforeException(UserNotBookedBeforeException e) {
+        log.warn("{}", e.getMessage());
+        return new ErrorResponse("Пользователь не использовал в прошлом вещь.", e.getMessage());
+    }
+
+    @ExceptionHandler(StatusAlreadyChangedException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handleStatusAlreadyChangedException(StatusAlreadyChangedException e) {
+        log.warn("{}", e.getMessage());
+        return new ErrorResponse("Статус был изменён ранее.", e.getMessage());
+    }
+
+    @ExceptionHandler(WrongUserIdException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ErrorResponse handleWrongUserIdException(WrongUserIdException e) {
+        log.warn("{}", e.getMessage());
+        return new ErrorResponse("Запрещенный id пользователя.", e.getMessage());
+    }
+
+    @ExceptionHandler(UnknownStateException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handleUnknownStateException(UnknownStateException e) {
+        log.warn("{}", e.getMessage());
+        return new ErrorResponse("Unknown state: UNSUPPORTED_STATUS", e.getMessage());
+    }
+
+    @ExceptionHandler(BookingNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ErrorResponse handleBookingNotFoundException(BookingNotFoundException e) {
+        log.warn("{}", e.getMessage());
+        return new ErrorResponse("Бронь не найдена.", e.getMessage());
+    }
+
+    @ExceptionHandler(StartNotBeforeEndException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handleStartAfterEndException(StartNotBeforeEndException e) {
+        log.warn("{}", e.getMessage());
+        return new ErrorResponse("Начало должно быть раньше окончания.", e.getMessage());
+    }
+
+    @ExceptionHandler(ItemNotAvailableException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handleItemNotAvailableException(ItemNotAvailableException e) {
+        log.warn("{}", e.getMessage());
+        return new ErrorResponse("Предмет не доступен.", e.getMessage());
+    }
+
     @ExceptionHandler(UserNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ErrorResponse handleUserNotFoundException(UserNotFoundException e) {
