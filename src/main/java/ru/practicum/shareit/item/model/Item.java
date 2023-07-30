@@ -29,11 +29,13 @@ public class Item {
     @Column(name = "is_available")
     private Boolean available;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "item")
+    @OneToMany(fetch = FetchType.LAZY)
+    @JoinColumn(name = "item_id", insertable = false, updatable = false)
     @ToString.Exclude
     private List<Booking> bookings;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "item")
+    @OneToMany(fetch = FetchType.LAZY)
+    @JoinColumn(name = "item_id", insertable = false, updatable = false)
     @ToString.Exclude
     private List<Comment> comments;
 
