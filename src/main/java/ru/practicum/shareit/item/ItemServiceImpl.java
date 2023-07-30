@@ -1,7 +1,11 @@
 package ru.practicum.shareit.item;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+import ru.practicum.shareit.booking.BookingMapper;
 import ru.practicum.shareit.booking.BookingRepository;
 import ru.practicum.shareit.booking.dto.BookingDtoForGetItemResponse;
 import ru.practicum.shareit.booking.model.Status;
@@ -23,6 +27,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
+@Transactional(propagation = Propagation.REQUIRED)
 @RequiredArgsConstructor
 public class ItemServiceImpl implements ItemService {
     private final ItemRepository itemRepository;
@@ -48,39 +53,38 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
+    @Transactional(readOnly = true, propagation = Propagation.REQUIRED)
     public Item findById(long itemId) {
         return itemRepository.findById(itemId)
                 .orElseThrow(() -> new ItemNotFoundException(String.format("Предмет с id %s не найден.", itemId)));
     }
 
     @Override
+    @Transactional(readOnly = true, propagation = Propagation.REQUIRED)
     public GetItemResponse findDtoById(long itemId, long ownerId) {
         Item item = findById(itemId);
-        List<CommentResponse> comments = commentRepository.findByItem_IdOrderByCreatedAsc(itemId).stream()
-                .map(CommentMapper::toCommentResponse).collect(Collectors.toList());
+        List<CommentResponse> comments = commentRepository.findByItem_IdOrderByCreatedAsc(itemId);
         if (!Objects.equals(item.getOwner().getId(), ownerId))
             return ItemMapper.toGetItemResponse(item, null, null, comments);
 
         BookingDtoForGetItemResponse lastBooking = bookingRepository
-                .findFirstByItemIdAndStatusAndStartIsBeforeOrderByStartDesc(itemId, Status.APPROVED, LocalDateTime.now());
+                .findLastBooking(itemId, Status.APPROVED, LocalDateTime.now(), PageRequest.of(0, 1))
+                .stream().map(BookingMapper::toBookingDtoForGetItemResponse).findFirst().orElse(null);
         BookingDtoForGetItemResponse nextBooking = bookingRepository
-                .findFirstByItemIdAndStatusAndStartIsAfterOrderByStartAsc(itemId, Status.APPROVED, LocalDateTime.now());
+                .findNextBooking(itemId, Status.APPROVED, LocalDateTime.now(), PageRequest.of(0, 1))
+                .stream().map(BookingMapper::toBookingDtoForGetItemResponse).findFirst().orElse(null);
         return ItemMapper.toGetItemResponse(item, lastBooking, nextBooking, comments);
     }
 
     @Override
+    @Transactional(readOnly = true, propagation = Propagation.REQUIRED)
     public List<GetItemResponse> findByOwnerId(long userId) {
-        return itemRepository.findByOwnerId(userId).stream().map(i -> ItemMapper.toGetItemResponse(i,
-                        bookingRepository.findFirstByItemIdAndStatusAndStartIsBeforeOrderByStartDesc(i.getId(),
-                                Status.APPROVED, LocalDateTime.now()),
-                        bookingRepository.findFirstByItemIdAndStatusAndStartIsAfterOrderByStartAsc(i.getId(),
-                                Status.APPROVED, LocalDateTime.now()),
-                        commentRepository.findByItem_IdOrderByCreatedAsc(i.getId()).stream()
-                                .map(CommentMapper::toCommentResponse).collect(Collectors.toList())))
-                .collect(Collectors.toList());
+        List<Item> items = itemRepository.findByOwnerId(userId);
+        return items.stream().map(ItemMapper::toGetItemResponse).collect(Collectors.toList());
     }
 
     @Override
+    @Transactional(readOnly = true, propagation = Propagation.REQUIRED)
     public List<SearchItemResponse> searchAvailableItemsByText(String text) {
         if (text.isBlank())
             return new ArrayList<>();

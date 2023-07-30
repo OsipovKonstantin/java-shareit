@@ -1,16 +1,20 @@
 package ru.practicum.shareit.item.model;
 
-import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.experimental.Accessors;
 import ru.practicum.shareit.user.model.User;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
-@Data
+@Getter
+@Setter
 @Entity
 @Accessors(chain = true)
 @Table(name = "comments")
+@EqualsAndHashCode(of = {"id"})
 public class Comment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -1,7 +1,10 @@
 package ru.practicum.shareit.booking;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
-import ru.practicum.shareit.booking.dto.BookingDtoForGetItemResponse;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.Status;
 
@@ -31,11 +34,23 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
 
     List<Booking> findByItemOwnerIdAndStatusOrderByStartDesc(Long ownerId, Status waiting);
 
-    BookingDtoForGetItemResponse findFirstByItemIdAndStatusAndStartIsBeforeOrderByStartDesc(long itemId, Status status,
-                                                                                            LocalDateTime now);
+    @Query("select bo " +
+            "from Booking as bo " +
+            "join bo.item as it " +
+            "where it.id = :itemId and bo.status = :status and bo.start < :now " +
+            "order by bo.start desc")
+    Page<Booking> findLastBooking(@Param("itemId") long itemId,
+                                  @Param("status") Status status,
+                                  @Param("now") LocalDateTime now, Pageable page);
 
-    BookingDtoForGetItemResponse findFirstByItemIdAndStatusAndStartIsAfterOrderByStartAsc(long itemId, Status status,
-                                                                                          LocalDateTime now);
+    @Query("select bo " +
+            "from Booking as bo " +
+            "join bo.item as it " +
+            "where it.id = :itemId and bo.status = :status and bo.start > :now " +
+            "order by bo.start asc")
+    Page<Booking> findNextBooking(@Param("itemId") long itemId,
+                                  @Param("status") Status status,
+                                  @Param("now") LocalDateTime now, Pageable page);
 
     Booking findFirstByBooker_IdAndItem_IdAndStatusAndEndIsBefore(Long authorId, Long itemId, Status approved,
                                                                   LocalDateTime now);

@@ -2,6 +2,8 @@ package ru.practicum.shareit.booking;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.Status;
 import ru.practicum.shareit.exception.*;
@@ -13,6 +15,7 @@ import java.util.List;
 import java.util.Objects;
 
 @Service
+@Transactional(propagation = Propagation.REQUIRED)
 @RequiredArgsConstructor
 public class BookingServiceImpl implements BookingService {
     private final BookingRepository bookingRepository;
@@ -45,6 +48,7 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
+    @Transactional(readOnly = true, propagation = Propagation.REQUIRED)
     public Booking findByIdAndOwnerOrBookerId(Long bookingId, Long ownerOrBookerId) {
         Booking booking = findById(bookingId);
         if (!Objects.equals(booking.getItem().getOwner().getId(), ownerOrBookerId)
@@ -55,6 +59,7 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
+    @Transactional(readOnly = true, propagation = Propagation.REQUIRED)
     public List<Booking> findByBookerIdAndState(Long bookerId, String state) {
         userService.findById(bookerId);
 
@@ -79,6 +84,7 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
+    @Transactional(readOnly = true, propagation = Propagation.REQUIRED)
     public List<Booking> findByItemOwnerIdAndState(Long ownerId, String state) {
         userService.findById(ownerId);
 

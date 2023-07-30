@@ -1,14 +1,14 @@
 package ru.practicum.shareit.booking.dto;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.experimental.Accessors;
 
 import javax.validation.constraints.Future;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
 @Data
-@Accessors(chain = true)
+@AllArgsConstructor
 public class CreateBookingDto {
     @NotNull
     private Long itemId;

@@ -5,6 +5,6 @@ import org.springframework.beans.factory.annotation.Value;
 public interface BookingDtoForGetItemResponse {
     long getId();
 
-    @Value("#{target.getBooker.getId}")
+    @Value("#{target.booker.id}")
     long getBookerId();
 }

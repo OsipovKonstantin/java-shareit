@@ -1,18 +1,19 @@
 package ru.practicum.shareit.item.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import lombok.experimental.Accessors;
+import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.request.model.ItemRequest;
 import ru.practicum.shareit.user.model.User;
 
 import javax.persistence.*;
+import java.util.List;
 
-@Data
+@Getter
+@Setter
 @Entity
 @NoArgsConstructor
-@AllArgsConstructor
+@EqualsAndHashCode(of = {"id"})
 @Table(name = "items")
 @Accessors(chain = true)
 public class Item {
@@ -27,6 +28,14 @@ public class Item {
 
     @Column(name = "is_available")
     private Boolean available;
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "item")
+    @ToString.Exclude
+    private List<Booking> bookings;
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "item")
+    @ToString.Exclude
+    private List<Comment> comments;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "owner_id")

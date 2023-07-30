@@ -1,15 +1,16 @@
 package ru.practicum.shareit.item.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
+import org.springframework.beans.factory.annotation.Value;
 
 import java.time.LocalDateTime;
 
-@Data
-@AllArgsConstructor
-public class CommentResponse {
-    private Long id;
-    private String text;
-    private String authorName;
-    private LocalDateTime created;
+public interface CommentResponse {
+    Long getId();
+
+    String getText();
+
+    @Value("#{target.getAuthor.getName}")
+    String getAuthorName();
+
+    LocalDateTime getCreated();
 }

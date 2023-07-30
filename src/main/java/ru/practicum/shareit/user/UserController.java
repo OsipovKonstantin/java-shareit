@@ -22,12 +22,12 @@ public class UserController {
     }
 
     @GetMapping
-    public List<UserDto> getAll() {
-        return userService.getAll().stream().map(UserMapper::toUserDto).collect(Collectors.toList());
+    public List<UserDto> findAll() {
+        return userService.findAll().stream().map(UserMapper::toUserDto).collect(Collectors.toList());
     }
 
     @GetMapping("/{userId}")
-    public UserDto getById(@PathVariable long userId) {
+    public UserDto findById(@PathVariable long userId) {
         return UserMapper.toUserDto(userService.findById(userId));
     }
 

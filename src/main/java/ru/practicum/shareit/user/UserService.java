@@ -7,7 +7,7 @@ import java.util.List;
 public interface UserService {
     User add(User user);
 
-    List<User> getAll();
+    List<User> findAll();
 
     User findById(long userId);
 

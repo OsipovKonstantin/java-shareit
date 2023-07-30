@@ -6,8 +6,8 @@ import lombok.Data;
 @Data
 @AllArgsConstructor
 public class SearchItemResponse {
-    long id;
-    String name;
-    String description;
-    boolean available;
+    private long id;
+    private String name;
+    private String description;
+    private boolean available;
 }
