@@ -1,24 +1,49 @@
 package ru.practicum.shareit.item.model;
 
-import lombok.Builder;
-import lombok.Data;
+import lombok.*;
+import lombok.experimental.Accessors;
+import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.request.model.ItemRequest;
 import ru.practicum.shareit.user.model.User;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
+import javax.persistence.*;
+import java.util.List;
 
-@Data
-@Builder
+@Getter
+@Setter
+@Entity
+@NoArgsConstructor
+@EqualsAndHashCode(of = {"id"})
+@Table(name = "items")
+@Accessors(chain = true)
 public class Item {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @NotBlank
+
     private String name;
-    @NotBlank
+
+    @Column(length = 2000)
     private String description;
-    @NotNull
+
+    @Column(name = "is_available")
     private Boolean available;
-    @NotNull
+
+    @OneToMany(fetch = FetchType.LAZY)
+    @JoinColumn(name = "item_id", insertable = false, updatable = false)
+    @ToString.Exclude
+    private List<Booking> bookings;
+
+    @OneToMany(fetch = FetchType.LAZY)
+    @JoinColumn(name = "item_id", insertable = false, updatable = false)
+    @ToString.Exclude
+    private List<Comment> comments;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "owner_id")
     private User owner;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "request_id")
     private ItemRequest request;
 }

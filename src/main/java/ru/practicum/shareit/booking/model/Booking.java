@@ -1,26 +1,40 @@
 package ru.practicum.shareit.booking.model;
 
-import lombok.Builder;
-import lombok.Data;
-import ru.practicum.shareit.booking.Status.Status;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.experimental.Accessors;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.model.User;
 
-import javax.validation.constraints.NotNull;
+import javax.persistence.*;
 import java.time.LocalDateTime;
 
-@Data
-@Builder
+@Getter
+@Setter
+@Entity
+@NoArgsConstructor
+@Accessors(chain = true)
+@Table(name = "bookings")
 public class Booking {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
-    @NotNull
+
+    @Column(name = "start_date")
     private LocalDateTime start;
-    @NotNull
+
+    @Column(name = "end_date")
     private LocalDateTime end;
-    @NotNull
-    private Item item;
-    @NotNull
-    private User booker;
-    @NotNull
+
+    @Enumerated(EnumType.STRING)
     private Status status;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "booker_id")
+    private User booker;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "item_id")
+    private Item item;
 }
