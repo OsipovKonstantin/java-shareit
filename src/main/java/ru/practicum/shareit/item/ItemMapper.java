@@ -2,7 +2,7 @@ package ru.practicum.shareit.item;
 
 import lombok.experimental.UtilityClass;
 import ru.practicum.shareit.booking.BookingMapper;
-import ru.practicum.shareit.booking.dto.BookingDtoForGetItemResponse;
+import ru.practicum.shareit.booking.dto.BookingShort;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.item.dto.*;
 import ru.practicum.shareit.item.model.Item;
@@ -15,20 +15,21 @@ import java.util.stream.Collectors;
 
 @UtilityClass
 public class ItemMapper {
-    public static CreateItemResponse toCreateItemResponse(Item item) {
-        return new CreateItemResponse(item.getId(),
+    public static ItemResponse toItemResponse(Item item) {
+        return new ItemResponse(item.getId(),
                 item.getName(),
                 item.getDescription(),
-                item.getAvailable());
+                item.getAvailable(),
+                item.getRequest() == null ? null : item.getRequest().getId());
     }
 
-    public static ItemDtoForGetBookingDto toItemDtoForBooking(Item item) {
-        return new ItemDtoForGetBookingDto(item.getId(), item.getName());
+    public static ItemShort toItemShort(Item item) {
+        return new ItemShort(item.getId(), item.getName());
     }
 
     public static GetItemResponse toGetItemResponse(Item item,
-                                                    BookingDtoForGetItemResponse lastBooking,
-                                                    BookingDtoForGetItemResponse nextBooking,
+                                                    BookingShort lastBooking,
+                                                    BookingShort nextBooking,
                                                     List<CommentResponse> commentResponse) {
         return new GetItemResponse(item.getId(),
                 item.getName(),
@@ -48,8 +49,8 @@ public class ItemMapper {
                 item.getName(),
                 item.getDescription(),
                 item.getAvailable(),
-                lastBookingNotDto == null ? null : BookingMapper.toBookingDtoForGetItemResponse(lastBookingNotDto),
-                nextBookingNotDto == null ? null : BookingMapper.toBookingDtoForGetItemResponse(nextBookingNotDto),
+                lastBookingNotDto == null ? null : BookingMapper.toBookingShort(lastBookingNotDto),
+                nextBookingNotDto == null ? null : BookingMapper.toBookingShort(nextBookingNotDto),
                 item.getComments().stream().map(CommentMapper::toCommentResponse).collect(Collectors.toList()));
     }
 

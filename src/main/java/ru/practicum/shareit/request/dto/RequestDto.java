@@ -8,7 +8,7 @@ import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
 @Data
-public class ItemRequestDto {
+public class RequestDto {
     private long id;
     @NotBlank
     private String description;

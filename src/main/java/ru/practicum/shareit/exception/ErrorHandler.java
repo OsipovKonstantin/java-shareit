@@ -11,6 +11,13 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice("ru.practicum.shareit")
 public class ErrorHandler {
 
+    @ExceptionHandler(RequestNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ErrorResponse handleRequestNotFoundException(RequestNotFoundException e) {
+        log.warn("{}", e.getMessage());
+        return new ErrorResponse("Запрос не найден.", e.getMessage());
+    }
+
     @ExceptionHandler(UserNotBookedBeforeException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handleUserNotBookedBeforeException(UserNotBookedBeforeException e) {

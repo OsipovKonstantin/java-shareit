@@ -1,13 +1,15 @@
 package ru.practicum.shareit.item;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.BookingMapper;
 import ru.practicum.shareit.booking.BookingRepository;
-import ru.practicum.shareit.booking.dto.BookingDtoForGetItemResponse;
+import ru.practicum.shareit.booking.dto.BookingShort;
 import ru.practicum.shareit.booking.model.Status;
 import ru.practicum.shareit.exception.IncompatibleUserIdException;
 import ru.practicum.shareit.exception.ItemNotFoundException;
@@ -15,13 +17,14 @@ import ru.practicum.shareit.exception.UserNotBookedBeforeException;
 import ru.practicum.shareit.item.dto.CommentResponse;
 import ru.practicum.shareit.item.dto.CreateCommentRequest;
 import ru.practicum.shareit.item.dto.GetItemResponse;
-import ru.practicum.shareit.item.dto.SearchItemResponse;
+import ru.practicum.shareit.item.dto.ItemResponse;
 import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.request.RequestService;
 import ru.practicum.shareit.user.UserService;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -34,9 +37,12 @@ public class ItemServiceImpl implements ItemService {
     private final BookingRepository bookingRepository;
     private final UserService userService;
     private final CommentRepository commentRepository;
+    private final RequestService requestService;
 
     @Override
-    public Item saveItem(Item item) {
+    public Item saveItem(Item item, Long requestId) {
+        if (requestId != null)
+            item.setRequest(requestService.findById(requestId));
         return itemRepository.save(item);
     }
 
@@ -67,28 +73,28 @@ public class ItemServiceImpl implements ItemService {
         if (!Objects.equals(item.getOwner().getId(), ownerId))
             return ItemMapper.toGetItemResponse(item, null, null, comments);
 
-        BookingDtoForGetItemResponse lastBooking = bookingRepository
+        BookingShort lastBooking = bookingRepository
                 .findLastBooking(itemId, Status.APPROVED, LocalDateTime.now(), PageRequest.of(0, 1))
-                .stream().map(BookingMapper::toBookingDtoForGetItemResponse).findFirst().orElse(null);
-        BookingDtoForGetItemResponse nextBooking = bookingRepository
+                .stream().map(BookingMapper::toBookingShort).findFirst().orElse(null);
+        BookingShort nextBooking = bookingRepository
                 .findNextBooking(itemId, Status.APPROVED, LocalDateTime.now(), PageRequest.of(0, 1))
-                .stream().map(BookingMapper::toBookingDtoForGetItemResponse).findFirst().orElse(null);
+                .stream().map(BookingMapper::toBookingShort).findFirst().orElse(null);
         return ItemMapper.toGetItemResponse(item, lastBooking, nextBooking, comments);
     }
 
     @Override
     @Transactional(readOnly = true, propagation = Propagation.REQUIRED)
-    public List<GetItemResponse> findByOwnerId(long userId) {
-        List<Item> items = itemRepository.findByOwnerId(userId);
+    public List<GetItemResponse> findByOwnerId(long userId, Pageable page) {
+        Page<Item> items = itemRepository.findByOwnerId(userId, page);
         return items.stream().map(ItemMapper::toGetItemResponse).collect(Collectors.toList());
     }
 
     @Override
     @Transactional(readOnly = true, propagation = Propagation.REQUIRED)
-    public List<SearchItemResponse> searchAvailableItemsByText(String text) {
+    public List<ItemResponse> searchAvailableItemsByText(String text, Pageable page) {
         if (text.isBlank())
-            return new ArrayList<>();
-        return itemRepository.searchAvailableItemsByText(text);
+            return Collections.emptyList();
+        return itemRepository.searchAvailableItemsByText(text, page).toList();
     }
 
     @Override

@@ -1,6 +1,8 @@
 package ru.practicum.shareit.booking;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -11,7 +13,6 @@ import ru.practicum.shareit.item.ItemService;
 import ru.practicum.shareit.user.UserService;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Objects;
 
 @Service
@@ -60,23 +61,23 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     @Transactional(readOnly = true, propagation = Propagation.REQUIRED)
-    public List<Booking> findByBookerIdAndState(Long bookerId, String state) {
+    public Page<Booking> findByBookerIdAndState(Long bookerId, String state, Pageable page) {
         userService.findById(bookerId);
 
         switch (state) {
             case "ALL":
-                return bookingRepository.findByBookerIdOrderByStartDesc(bookerId);
+                return bookingRepository.findByBookerIdOrderByStartDesc(bookerId, page);
             case "CURRENT":
-                return bookingRepository.findByBookerIdAndStartIsBeforeAndEndIsAfterOrderByStartDesc(bookerId,
-                        LocalDateTime.now(), LocalDateTime.now());
+                return bookingRepository.findByBookerIdAndStartIsBeforeAndEndIsAfterOrderByStart(bookerId,
+                        LocalDateTime.now(), LocalDateTime.now(), page);
             case "PAST":
-                return bookingRepository.findByBookerIdAndEndIsBeforeOrderByStartDesc(bookerId, LocalDateTime.now());
+                return bookingRepository.findByBookerIdAndEndIsBeforeOrderByStartDesc(bookerId, LocalDateTime.now(), page);
             case "FUTURE":
-                return bookingRepository.findByBookerIdAndStartIsAfterOrderByStartDesc(bookerId, LocalDateTime.now());
+                return bookingRepository.findByBookerIdAndStartIsAfterOrderByStartDesc(bookerId, LocalDateTime.now(), page);
             case "WAITING":
-                return bookingRepository.findByBookerIdAndStatusOrderByStartDesc(bookerId, Status.WAITING);
+                return bookingRepository.findByBookerIdAndStatusOrderByStartDesc(bookerId, Status.WAITING, page);
             case "REJECTED":
-                return bookingRepository.findByBookerIdAndStatusOrderByStartDesc(bookerId, Status.REJECTED);
+                return bookingRepository.findByBookerIdAndStatusOrderByStartDesc(bookerId, Status.REJECTED, page);
             default:
                 throw new UnknownStateException(String.format("Передано неподдерживаемое состояние бронирования %s",
                         state));
@@ -85,23 +86,25 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     @Transactional(readOnly = true, propagation = Propagation.REQUIRED)
-    public List<Booking> findByItemOwnerIdAndState(Long ownerId, String state) {
+    public Page<Booking> findByItemOwnerIdAndState(Long ownerId, String state, Pageable page) {
         userService.findById(ownerId);
 
         switch (state) {
             case "ALL":
-                return bookingRepository.findByItemOwnerIdOrderByStartDesc(ownerId);
+                return bookingRepository.findByItemOwnerId(ownerId, page);
             case "CURRENT":
-                return bookingRepository.findByItemOwnerIdAndStartIsBeforeAndEndIsAfterOrderByStartDesc(ownerId,
-                        LocalDateTime.now(), LocalDateTime.now());
+                return bookingRepository.findByItemOwnerIdAndStartIsBeforeAndEndIsAfter(ownerId,
+                        LocalDateTime.now(), LocalDateTime.now(), page);
             case "PAST":
-                return bookingRepository.findByItemOwnerIdAndEndIsBeforeOrderByStartDesc(ownerId, LocalDateTime.now());
+                return bookingRepository.findByItemOwnerIdAndEndIsBefore(ownerId, LocalDateTime.now(),
+                        page);
             case "FUTURE":
-                return bookingRepository.findByItemOwnerIdAndStartIsAfterOrderByStartDesc(ownerId, LocalDateTime.now());
+                return bookingRepository.findByItemOwnerIdAndStartIsAfter(ownerId, LocalDateTime.now(),
+                        page);
             case "WAITING":
-                return bookingRepository.findByItemOwnerIdAndStatusOrderByStartDesc(ownerId, Status.WAITING);
+                return bookingRepository.findByItemOwnerIdAndStatus(ownerId, Status.WAITING, page);
             case "REJECTED":
-                return bookingRepository.findByItemOwnerIdAndStatusOrderByStartDesc(ownerId, Status.REJECTED);
+                return bookingRepository.findByItemOwnerIdAndStatus(ownerId, Status.REJECTED, page);
             default:
                 throw new UnknownStateException(String.format("Передано неподдерживаемое состояние бронирования %s",
                         state));

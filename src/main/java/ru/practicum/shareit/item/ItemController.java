@@ -4,8 +4,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.item.dto.*;
 import ru.practicum.shareit.user.UserService;
+import ru.practicum.shareit.util.OffsetBasedPageRequest;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Min;
 import java.util.List;
 
 @RestController
@@ -16,18 +18,17 @@ public class ItemController {
     private final UserService userService;
 
     @PostMapping
-    public CreateItemResponse saveItem(@RequestHeader("X-Sharer-User-Id") long userId,
-                                       @RequestBody @Valid CreateItemRequest createItemRequest) {
-        return ItemMapper.toCreateItemResponse(
-                itemService.saveItem(ItemMapper.toItem(userService.findById(userId), createItemRequest))
-        );
+    public ItemResponse saveItem(@RequestHeader("X-Sharer-User-Id") long userId,
+                                 @RequestBody @Valid CreateItemRequest createItemRequest) {
+        return ItemMapper.toItemResponse(itemService.saveItem(
+                ItemMapper.toItem(userService.findById(userId), createItemRequest), createItemRequest.getRequestId()));
     }
 
     @PatchMapping("/{itemId}")
-    public CreateItemResponse update(@RequestHeader("X-Sharer-User-Id") long userId,
-                                     @PathVariable long itemId,
-                                     @RequestBody CreateItemRequest createItemRequest) {
-        return ItemMapper.toCreateItemResponse(itemService.update(
+    public ItemResponse update(@RequestHeader("X-Sharer-User-Id") long userId,
+                               @PathVariable long itemId,
+                               @RequestBody CreateItemRequest createItemRequest) {
+        return ItemMapper.toItemResponse(itemService.update(
                 ItemMapper.toItem(userService.findById(userId), createItemRequest).setId(itemId)
         ));
     }
@@ -39,13 +40,17 @@ public class ItemController {
     }
 
     @GetMapping
-    public List<GetItemResponse> findByOwnerId(@RequestHeader("X-Sharer-User-Id") long userId) {
-        return itemService.findByOwnerId(userId);
+    public List<GetItemResponse> findByOwnerId(@RequestHeader("X-Sharer-User-Id") long userId,
+                                               @RequestParam(defaultValue = "0") @Min(0) Long from,
+                                               @RequestParam(defaultValue = "10") @Min(1) int size) {
+        return itemService.findByOwnerId(userId, new OffsetBasedPageRequest(from, size));
     }
 
     @GetMapping("/search")
-    public List<SearchItemResponse> searchAvailableItemsByText(@RequestParam String text) {
-        return itemService.searchAvailableItemsByText(text);
+    public List<ItemResponse> searchAvailableItemsByText(@RequestParam String text,
+                                                         @RequestParam(defaultValue = "0") @Min(0) Long from,
+                                                         @RequestParam(defaultValue = "10") @Min(1) int size) {
+        return itemService.searchAvailableItemsByText(text, new OffsetBasedPageRequest(from, size));
     }
 
     @PostMapping("/{itemId}/comment")
