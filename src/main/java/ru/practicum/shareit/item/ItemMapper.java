@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 
 @UtilityClass
 public class ItemMapper {
-    public static ItemResponse toItemResponse(Item item) {
+    public ItemResponse toItemResponse(Item item) {
         return new ItemResponse(item.getId(),
                 item.getName(),
                 item.getDescription(),
@@ -23,14 +23,14 @@ public class ItemMapper {
                 item.getRequest() == null ? null : item.getRequest().getId());
     }
 
-    public static ItemShort toItemShort(Item item) {
+    public ItemShort toItemShort(Item item) {
         return new ItemShort(item.getId(), item.getName());
     }
 
-    public static GetItemResponse toGetItemResponse(Item item,
-                                                    BookingShort lastBooking,
-                                                    BookingShort nextBooking,
-                                                    List<CommentResponse> commentResponse) {
+    public GetItemResponse toGetItemResponse(Item item,
+                                             BookingShort lastBooking,
+                                             BookingShort nextBooking,
+                                             List<CommentResponse> commentResponse) {
         return new GetItemResponse(item.getId(),
                 item.getName(),
                 item.getDescription(),
@@ -40,7 +40,7 @@ public class ItemMapper {
                 commentResponse);
     }
 
-    public static GetItemResponse toGetItemResponse(Item item) {
+    public GetItemResponse toGetItemResponse(Item item) {
         Booking lastBookingNotDto = item.getBookings().stream().filter(b -> b.getStart().isBefore(LocalDateTime.now()))
                 .max(Comparator.comparing(Booking::getStart)).orElse(null);
         Booking nextBookingNotDto = item.getBookings().stream().filter(b -> b.getStart().isAfter(LocalDateTime.now()))
@@ -54,7 +54,7 @@ public class ItemMapper {
                 item.getComments().stream().map(CommentMapper::toCommentResponse).collect(Collectors.toList()));
     }
 
-    public static Item toItem(User user, CreateItemRequest createItemRequest) {
+    public Item toItem(User user, CreateItemRequest createItemRequest) {
         return new Item()
                 .setName(createItemRequest.getName())
                 .setDescription(createItemRequest.getDescription())

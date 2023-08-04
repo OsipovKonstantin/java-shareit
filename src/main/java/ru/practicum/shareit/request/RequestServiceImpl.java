@@ -1,45 +1,64 @@
 package ru.practicum.shareit.request;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.exception.RequestNotFoundException;
+import ru.practicum.shareit.request.dto.CreateRequestRequest;
+import ru.practicum.shareit.request.dto.CreateRequestResponse;
+import ru.practicum.shareit.request.dto.GetRequestResponse;
 import ru.practicum.shareit.request.model.Request;
 import ru.practicum.shareit.user.UserService;
 import ru.practicum.shareit.util.OffsetBasedPageRequest;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(propagation = Propagation.REQUIRED)
 public class RequestServiceImpl implements RequestService {
     private final RequestRepository requestRepository;
     private final UserService userService;
 
     @Override
-    public Request save(Request request) {
-        return requestRepository.save(request);
+    public CreateRequestResponse save(CreateRequestRequest createRequestRequest, Long requestorId) {
+        Request request = new Request()
+                .setDescription(createRequestRequest.getDescription())
+                .setRequestor(userService.findById(requestorId));
+        return RequestMapper.toCreateRequestResponse(requestRepository.save(request));
     }
 
+    @Transactional(readOnly = true, propagation = Propagation.REQUIRED)
     @Override
     public Request findById(Long requestId) {
         return requestRepository.findById(requestId).orElseThrow(() -> new RequestNotFoundException(
                 String.format("Запрос с id %d не найден.", requestId)));
     }
 
+    @Transactional(readOnly = true, propagation = Propagation.REQUIRED)
     @Override
-    public List<Request> findByRequestorId(Long requestorId) {
+    public List<GetRequestResponse> findByRequestorId(Long requestorId) {
         userService.findById(requestorId);
-        return requestRepository.findByRequestorId(requestorId);
+        return requestRepository.findByRequestorId(requestorId)
+                .stream().map(RequestMapper::toGetRequestResponse).collect(Collectors.toList());
     }
 
+    @Transactional(readOnly = true, propagation = Propagation.REQUIRED)
     @Override
-    public List<Request> findRequestsForAnotherRequestors(Long requestorId, OffsetBasedPageRequest page) {
-        return requestRepository.findByRequestorIdNot(requestorId, page);
+    public List<GetRequestResponse> findRequestsForAnotherRequestors(Long requestorId, Long from, int size) {
+        Pageable page = new OffsetBasedPageRequest(from, size, Sort.by("created").descending());
+        return requestRepository.findByRequestorIdNot(requestorId, page)
+                .stream().map(RequestMapper::toGetRequestResponse).collect(Collectors.toList());
     }
 
+    @Transactional(readOnly = true, propagation = Propagation.REQUIRED)
     @Override
-    public Request findById(Long requestId, Long userId) {
+    public GetRequestResponse findById(Long requestId, Long userId) {
         userService.findById(userId);
-        return findById(requestId);
+        return RequestMapper.toGetRequestResponse(findById(requestId));
     }
 }

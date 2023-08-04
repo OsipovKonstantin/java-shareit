@@ -3,112 +3,148 @@ package ru.practicum.shareit.booking;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import ru.practicum.shareit.booking.dto.CreateBookingDto;
+import ru.practicum.shareit.booking.dto.GetBookingDto;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.Status;
 import ru.practicum.shareit.exception.*;
 import ru.practicum.shareit.item.ItemService;
 import ru.practicum.shareit.user.UserService;
+import ru.practicum.shareit.util.OffsetBasedPageRequest;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Service
-@Transactional(propagation = Propagation.REQUIRED)
 @RequiredArgsConstructor
+@Transactional(propagation = Propagation.REQUIRED)
 public class BookingServiceImpl implements BookingService {
     private final BookingRepository bookingRepository;
     private final UserService userService;
     private final ItemService itemService;
 
     @Override
-    public Booking save(Booking booking) {
+    public GetBookingDto save(Long bookerId, CreateBookingDto createBookingDto) {
+        Booking booking = new Booking()
+                .setStart(createBookingDto.getStart())
+                .setEnd(createBookingDto.getEnd())
+                .setStatus(Status.WAITING)
+                .setBooker(userService.findById(bookerId))
+                .setItem(itemService.findById(createBookingDto.getItemId()));
+
         if (Objects.equals(itemService.findById(booking.getItem().getId()).getOwner().getId(),
                 booking.getBooker().getId()))
             throw new WrongUserIdException("Создание брони не доступно для владельца предмета.");
-
         if (!booking.getItem().getAvailable())
             throw new ItemNotAvailableException("Предмет не доступен для бронирования.");
         if (booking.getStart().isAfter(booking.getEnd()) || booking.getStart().isEqual(booking.getEnd()))
             throw new StartNotBeforeEndException("Время начала использования вещи должно быть строго раньше " +
                     "времени окончания.");
-        return bookingRepository.save(booking);
+
+        return BookingMapper.toGetBookingDto(bookingRepository.save(booking));
     }
 
     @Override
-    public Booking update(Long bookingId, Long ownerId, boolean approved) {
+    public GetBookingDto update(Long bookingId, Long ownerId, boolean approved) {
         Booking oldBooking = findById(bookingId);
+
         if (!Objects.equals(oldBooking.getItem().getOwner().getId(), ownerId))
             throw new WrongUserIdException("Обновление статуса брони доступно только для владельцев предметов.");
         if (!Objects.equals(oldBooking.getStatus(), Status.WAITING))
             throw new StatusAlreadyChangedException(String.format("Статус был изменён владельцем предмета ранее на %s",
                     oldBooking.getStatus()));
-        return bookingRepository.save(oldBooking.setStatus(approved ? Status.APPROVED : Status.REJECTED));
+
+        return BookingMapper.toGetBookingDto(
+                bookingRepository.save(oldBooking.setStatus(approved ? Status.APPROVED : Status.REJECTED)));
     }
 
-    @Override
     @Transactional(readOnly = true, propagation = Propagation.REQUIRED)
-    public Booking findByIdAndOwnerOrBookerId(Long bookingId, Long ownerOrBookerId) {
+    @Override
+    public GetBookingDto findByIdAndOwnerOrBookerId(Long bookingId, Long ownerOrBookerId) {
         Booking booking = findById(bookingId);
+
         if (!Objects.equals(booking.getItem().getOwner().getId(), ownerOrBookerId)
                 && !Objects.equals(booking.getBooker().getId(), ownerOrBookerId))
             throw new WrongUserIdException(String.format("Пользователь с id %d не является владельцем " +
                     "предмета или бронирующим, поэтому информация о брони недоступна.", ownerOrBookerId));
-        return booking;
+
+        return BookingMapper.toGetBookingDto(booking);
     }
 
-    @Override
     @Transactional(readOnly = true, propagation = Propagation.REQUIRED)
-    public Page<Booking> findByBookerIdAndState(Long bookerId, String state, Pageable page) {
+    @Override
+    public List<GetBookingDto> findByBookerIdAndState(Long bookerId, String state, Long from, int size) {
+        Pageable page = new OffsetBasedPageRequest(from, size);
         userService.findById(bookerId);
+        Page<Booking> bookingPage;
 
         switch (state) {
             case "ALL":
-                return bookingRepository.findByBookerIdOrderByStartDesc(bookerId, page);
+                bookingPage = bookingRepository.findByBookerIdOrderByStartDesc(bookerId, page);
+                break;
             case "CURRENT":
-                return bookingRepository.findByBookerIdAndStartIsBeforeAndEndIsAfterOrderByStart(bookerId,
+                bookingPage = bookingRepository.findByBookerIdAndStartIsBeforeAndEndIsAfterOrderByStart(bookerId,
                         LocalDateTime.now(), LocalDateTime.now(), page);
+                break;
             case "PAST":
-                return bookingRepository.findByBookerIdAndEndIsBeforeOrderByStartDesc(bookerId, LocalDateTime.now(), page);
+                bookingPage = bookingRepository.findByBookerIdAndEndIsBeforeOrderByStartDesc(bookerId, LocalDateTime.now(), page);
+                break;
             case "FUTURE":
-                return bookingRepository.findByBookerIdAndStartIsAfterOrderByStartDesc(bookerId, LocalDateTime.now(), page);
+                bookingPage = bookingRepository.findByBookerIdAndStartIsAfterOrderByStartDesc(bookerId, LocalDateTime.now(), page);
+                break;
             case "WAITING":
-                return bookingRepository.findByBookerIdAndStatusOrderByStartDesc(bookerId, Status.WAITING, page);
+                bookingPage = bookingRepository.findByBookerIdAndStatusOrderByStartDesc(bookerId, Status.WAITING, page);
+                break;
             case "REJECTED":
-                return bookingRepository.findByBookerIdAndStatusOrderByStartDesc(bookerId, Status.REJECTED, page);
+                bookingPage = bookingRepository.findByBookerIdAndStatusOrderByStartDesc(bookerId, Status.REJECTED, page);
+                break;
             default:
                 throw new UnknownStateException(String.format("Передано неподдерживаемое состояние бронирования %s",
                         state));
         }
+        return bookingPage.stream().map(BookingMapper::toGetBookingDto).collect(Collectors.toList());
     }
 
-    @Override
     @Transactional(readOnly = true, propagation = Propagation.REQUIRED)
-    public Page<Booking> findByItemOwnerIdAndState(Long ownerId, String state, Pageable page) {
+    @Override
+    public List<GetBookingDto> findByItemOwnerIdAndState(Long ownerId, String state, Long from, int size) {
+        Pageable page = new OffsetBasedPageRequest(from, size, Sort.by("start").descending());
         userService.findById(ownerId);
+        Page<Booking> bookingPage;
 
         switch (state) {
             case "ALL":
-                return bookingRepository.findByItemOwnerId(ownerId, page);
+                bookingPage = bookingRepository.findByItemOwnerId(ownerId, page);
+                break;
             case "CURRENT":
-                return bookingRepository.findByItemOwnerIdAndStartIsBeforeAndEndIsAfter(ownerId,
+                bookingPage = bookingRepository.findByItemOwnerIdAndStartIsBeforeAndEndIsAfter(ownerId,
                         LocalDateTime.now(), LocalDateTime.now(), page);
+                break;
             case "PAST":
-                return bookingRepository.findByItemOwnerIdAndEndIsBefore(ownerId, LocalDateTime.now(),
+                bookingPage = bookingRepository.findByItemOwnerIdAndEndIsBefore(ownerId, LocalDateTime.now(),
                         page);
+                break;
             case "FUTURE":
-                return bookingRepository.findByItemOwnerIdAndStartIsAfter(ownerId, LocalDateTime.now(),
+                bookingPage = bookingRepository.findByItemOwnerIdAndStartIsAfter(ownerId, LocalDateTime.now(),
                         page);
+                break;
             case "WAITING":
-                return bookingRepository.findByItemOwnerIdAndStatus(ownerId, Status.WAITING, page);
+                bookingPage = bookingRepository.findByItemOwnerIdAndStatus(ownerId, Status.WAITING, page);
+                break;
             case "REJECTED":
-                return bookingRepository.findByItemOwnerIdAndStatus(ownerId, Status.REJECTED, page);
+                bookingPage = bookingRepository.findByItemOwnerIdAndStatus(ownerId, Status.REJECTED, page);
+                break;
             default:
                 throw new UnknownStateException(String.format("Передано неподдерживаемое состояние бронирования %s",
                         state));
         }
+        return bookingPage.stream().map(BookingMapper::toGetBookingDto).collect(Collectors.toList());
     }
 
     private Booking findById(Long id) {

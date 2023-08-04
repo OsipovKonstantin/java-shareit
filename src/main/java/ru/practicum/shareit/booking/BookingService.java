@@ -1,17 +1,18 @@
 package ru.practicum.shareit.booking;
 
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import ru.practicum.shareit.booking.model.Booking;
+import ru.practicum.shareit.booking.dto.CreateBookingDto;
+import ru.practicum.shareit.booking.dto.GetBookingDto;
+
+import java.util.List;
 
 public interface BookingService {
-    Booking save(Booking booking);
+    GetBookingDto save(Long bookerId, CreateBookingDto createBookingDto);
 
-    Booking update(Long bookingId, Long ownerId, boolean approved);
+    GetBookingDto update(Long bookingId, Long ownerId, boolean approved);
 
-    Booking findByIdAndOwnerOrBookerId(Long bookingId, Long ownerOrBookerId);
+    GetBookingDto findByIdAndOwnerOrBookerId(Long bookingId, Long ownerOrBookerId);
 
-    Page<Booking> findByBookerIdAndState(Long bookerId, String state, Pageable page);
+    List<GetBookingDto> findByBookerIdAndState(Long bookerId, String state, Long from, int size);
 
-    Page<Booking> findByItemOwnerIdAndState(Long ownerId, String state, Pageable page);
+    List<GetBookingDto> findByItemOwnerIdAndState(Long ownerId, String state, Long from, int size);
 }

@@ -1,7 +1,6 @@
 package ru.practicum.shareit.item;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -14,14 +13,12 @@ import ru.practicum.shareit.booking.model.Status;
 import ru.practicum.shareit.exception.IncompatibleUserIdException;
 import ru.practicum.shareit.exception.ItemNotFoundException;
 import ru.practicum.shareit.exception.UserNotBookedBeforeException;
-import ru.practicum.shareit.item.dto.CommentResponse;
-import ru.practicum.shareit.item.dto.CreateCommentRequest;
-import ru.practicum.shareit.item.dto.GetItemResponse;
-import ru.practicum.shareit.item.dto.ItemResponse;
+import ru.practicum.shareit.item.dto.*;
 import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.request.RequestService;
 import ru.practicum.shareit.user.UserService;
+import ru.practicum.shareit.util.OffsetBasedPageRequest;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
@@ -30,8 +27,8 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
-@Transactional(propagation = Propagation.REQUIRED)
 @RequiredArgsConstructor
+@Transactional(propagation = Propagation.REQUIRED)
 public class ItemServiceImpl implements ItemService {
     private final ItemRepository itemRepository;
     private final BookingRepository bookingRepository;
@@ -40,33 +37,39 @@ public class ItemServiceImpl implements ItemService {
     private final RequestService requestService;
 
     @Override
-    public Item saveItem(Item item, Long requestId) {
+    public ItemResponse saveItem(long userId, CreateItemRequest createItemRequest) {
+        Item item = ItemMapper.toItem(userService.findById(userId), createItemRequest);
+
+        Long requestId = createItemRequest.getRequestId();
         if (requestId != null)
             item.setRequest(requestService.findById(requestId));
-        return itemRepository.save(item);
+
+        return ItemMapper.toItemResponse(itemRepository.save(item));
     }
 
     @Override
-    public Item update(Item item) {
-        Item oldItem = findById(item.getId());
+    public ItemResponse update(long userId, long itemId, CreateItemRequest createItemRequest) {
+        Item item = ItemMapper.toItem(userService.findById(userId), createItemRequest).setId(itemId);
+        Item oldItem = findById(itemId);
+
         if (!Objects.equals(item.getOwner().getId(), oldItem.getOwner().getId()))
             throw new IncompatibleUserIdException("id пользователей не совпадают.");
 
-        return itemRepository.save(oldItem
-                .setName(item.getName() == null ? oldItem.getName() : item.getName())
-                .setDescription(item.getDescription() == null ? oldItem.getDescription() : item.getDescription())
-                .setAvailable(item.getAvailable() == null ? oldItem.getAvailable() : item.getAvailable()));
+        return ItemMapper.toItemResponse(
+                itemRepository.save(oldItem.setName(item.getName() == null ? oldItem.getName() : item.getName())
+                        .setDescription(item.getDescription() == null ? oldItem.getDescription() : item.getDescription())
+                        .setAvailable(item.getAvailable() == null ? oldItem.getAvailable() : item.getAvailable())));
     }
 
-    @Override
     @Transactional(readOnly = true, propagation = Propagation.REQUIRED)
+    @Override
     public Item findById(long itemId) {
         return itemRepository.findById(itemId)
                 .orElseThrow(() -> new ItemNotFoundException(String.format("Предмет с id %s не найден.", itemId)));
     }
 
-    @Override
     @Transactional(readOnly = true, propagation = Propagation.REQUIRED)
+    @Override
     public GetItemResponse findDtoById(long itemId, long ownerId) {
         Item item = findById(itemId);
         List<CommentResponse> comments = commentRepository.findByItem_IdOrderByCreatedAsc(itemId);
@@ -79,19 +82,22 @@ public class ItemServiceImpl implements ItemService {
         BookingShort nextBooking = bookingRepository
                 .findNextBooking(itemId, Status.APPROVED, LocalDateTime.now(), PageRequest.of(0, 1))
                 .stream().map(BookingMapper::toBookingShort).findFirst().orElse(null);
+
         return ItemMapper.toGetItemResponse(item, lastBooking, nextBooking, comments);
     }
 
-    @Override
     @Transactional(readOnly = true, propagation = Propagation.REQUIRED)
-    public List<GetItemResponse> findByOwnerId(long userId, Pageable page) {
-        Page<Item> items = itemRepository.findByOwnerId(userId, page);
-        return items.stream().map(ItemMapper::toGetItemResponse).collect(Collectors.toList());
+    @Override
+    public List<GetItemResponse> findByOwnerId(long userId, Long from, int size) {
+        Pageable page = new OffsetBasedPageRequest(from, size);
+        return itemRepository.findByOwnerId(userId, page)
+                .stream().map(ItemMapper::toGetItemResponse).collect(Collectors.toList());
     }
 
-    @Override
     @Transactional(readOnly = true, propagation = Propagation.REQUIRED)
-    public List<ItemResponse> searchAvailableItemsByText(String text, Pageable page) {
+    @Override
+    public List<ItemResponse> searchAvailableItemsByText(String text, Long from, int size) {
+        Pageable page = new OffsetBasedPageRequest(from, size);
         if (text.isBlank())
             return Collections.emptyList();
         return itemRepository.searchAvailableItemsByText(text, page).toList();

@@ -1,26 +1,22 @@
 package ru.practicum.shareit.item;
 
-import org.springframework.data.domain.Pageable;
-import ru.practicum.shareit.item.dto.CommentResponse;
-import ru.practicum.shareit.item.dto.CreateCommentRequest;
-import ru.practicum.shareit.item.dto.GetItemResponse;
-import ru.practicum.shareit.item.dto.ItemResponse;
+import ru.practicum.shareit.item.dto.*;
 import ru.practicum.shareit.item.model.Item;
 
 import java.util.List;
 
 public interface ItemService {
-    Item saveItem(Item item, Long requestId);
+    ItemResponse saveItem(long userId, CreateItemRequest createItemRequest);
 
-    Item update(Item item);
+    ItemResponse update(long userId, long itemId, CreateItemRequest createItemRequest);
 
     Item findById(long itemId);
 
     GetItemResponse findDtoById(long itemId, long ownerId);
 
-    List<GetItemResponse> findByOwnerId(long userId, Pageable page);
+    List<GetItemResponse> findByOwnerId(long userId, Long from, int size);
 
-    List<ItemResponse> searchAvailableItemsByText(String text, Pageable page);
+    List<ItemResponse> searchAvailableItemsByText(String text, Long from, int size);
 
     CommentResponse saveComment(Long authorId, Long itemId, CreateCommentRequest createCommentRequest);
 }

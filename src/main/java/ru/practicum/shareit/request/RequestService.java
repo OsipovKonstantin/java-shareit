@@ -1,18 +1,20 @@
 package ru.practicum.shareit.request;
 
+import ru.practicum.shareit.request.dto.CreateRequestRequest;
+import ru.practicum.shareit.request.dto.CreateRequestResponse;
+import ru.practicum.shareit.request.dto.GetRequestResponse;
 import ru.practicum.shareit.request.model.Request;
-import ru.practicum.shareit.util.OffsetBasedPageRequest;
 
 import java.util.List;
 
 public interface RequestService {
-    Request save(Request request);
+    CreateRequestResponse save(CreateRequestRequest createRequestRequest, Long requestorId);
 
     Request findById(Long requestId);
 
-    List<Request> findByRequestorId(Long requestorId);
+    List<GetRequestResponse> findByRequestorId(Long requestorId);
 
-    List<Request> findRequestsForAnotherRequestors(Long requestorId, OffsetBasedPageRequest page);
+    List<GetRequestResponse> findRequestsForAnotherRequestors(Long requestorId, Long from, int size);
 
-    Request findById(Long requestId, Long userId);
+    GetRequestResponse findById(Long requestId, Long userId);
 }

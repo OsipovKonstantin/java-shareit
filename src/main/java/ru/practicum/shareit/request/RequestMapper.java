@@ -10,14 +10,14 @@ import java.util.stream.Collectors;
 
 @UtilityClass
 public class RequestMapper {
-    public static CreateRequestResponse toCreateRequestResponse(Request request) {
+    public CreateRequestResponse toCreateRequestResponse(Request request) {
         return new CreateRequestResponse(
                 request.getId(),
                 request.getDescription(),
                 request.getCreated());
     }
 
-    public static GetRequestResponse toGetRequestResponse(Request request) {
+    public GetRequestResponse toGetRequestResponse(Request request) {
         return new GetRequestResponse(
                 request.getId(),
                 request.getDescription(),

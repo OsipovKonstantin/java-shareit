@@ -9,13 +9,14 @@ import ru.practicum.shareit.user.model.User;
 import javax.persistence.*;
 import java.util.List;
 
+@Entity
+@Table(name = "items")
 @Getter
 @Setter
-@Entity
+@ToString
 @NoArgsConstructor
-@EqualsAndHashCode(of = {"id"})
-@Table(name = "items")
 @Accessors(chain = true)
+@EqualsAndHashCode(of = {"id"})
 public class Item {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -29,20 +30,22 @@ public class Item {
     @Column(name = "is_available")
     private Boolean available;
 
+    @ToString.Exclude
     @OneToMany(fetch = FetchType.LAZY)
     @JoinColumn(name = "item_id", insertable = false, updatable = false)
-    @ToString.Exclude
     private List<Booking> bookings;
 
+    @ToString.Exclude
     @OneToMany(fetch = FetchType.LAZY)
     @JoinColumn(name = "item_id", insertable = false, updatable = false)
-    @ToString.Exclude
     private List<Comment> comments;
 
+    @ToString.Exclude
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "owner_id")
     private User owner;
 
+    @ToString.Exclude
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "request_id")
     private Request request;

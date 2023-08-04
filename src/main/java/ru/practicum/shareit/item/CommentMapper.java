@@ -8,7 +8,7 @@ import ru.practicum.shareit.item.model.Comment;
 
 @UtilityClass
 public class CommentMapper {
-    public static CommentResponse toCommentResponse(Comment comment) {
+    public CommentResponse toCommentResponse(Comment comment) {
         ProjectionFactory factory = new SpelAwareProxyProjectionFactory();
         return factory.createProjection(CommentResponse.class, comment);
     }

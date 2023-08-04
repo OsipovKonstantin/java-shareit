@@ -1,19 +1,19 @@
 package ru.practicum.shareit.item.model;
 
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import lombok.experimental.Accessors;
 import ru.practicum.shareit.user.model.User;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
+@Entity
+@Table(name = "comments")
 @Getter
 @Setter
-@Entity
+@ToString
+@NoArgsConstructor
 @Accessors(chain = true)
-@Table(name = "comments")
 @EqualsAndHashCode(of = {"id"})
 public class Comment {
     @Id
@@ -23,10 +23,12 @@ public class Comment {
     @Column(length = 1000)
     private String text;
 
+    @ToString.Exclude
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "item_id")
     private Item item;
 
+    @ToString.Exclude
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "author_id")
     private User author;

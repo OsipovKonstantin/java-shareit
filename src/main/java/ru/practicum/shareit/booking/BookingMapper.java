@@ -11,16 +11,16 @@ import ru.practicum.shareit.user.UserMapper;
 
 @UtilityClass
 public class BookingMapper {
-    public static GetBookingDto toGetBookingDto(Booking booking) {
+    public GetBookingDto toGetBookingDto(Booking booking) {
         return new GetBookingDto(booking.getId(),
                 booking.getStart(),
                 booking.getEnd(),
                 booking.getStatus(),
-                UserMapper.toUserDtoForBooking(booking.getBooker()),
+                UserMapper.toUserShort(booking.getBooker()),
                 ItemMapper.toItemShort(booking.getItem()));
     }
 
-    public static BookingShort toBookingShort(Booking booking) {
+    public BookingShort toBookingShort(Booking booking) {
         ProjectionFactory factory = new SpelAwareProxyProjectionFactory();
         return factory.createProjection(BookingShort.class, booking);
     }
