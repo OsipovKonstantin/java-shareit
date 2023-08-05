@@ -1,10 +1,10 @@
-package ru.practicum.shareit.request;
+package ru.practicum.shareit.request.mapper;
 
 import lombok.experimental.UtilityClass;
-import ru.practicum.shareit.item.ItemMapper;
+import ru.practicum.shareit.item.mapper.ItemMapper;
 import ru.practicum.shareit.request.dto.CreateRequestResponse;
 import ru.practicum.shareit.request.dto.GetRequestResponse;
-import ru.practicum.shareit.request.model.Request;
+import ru.practicum.shareit.request.entity.Request;
 
 import java.util.stream.Collectors;
 

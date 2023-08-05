@@ -9,13 +9,14 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.BookingMapper;
 import ru.practicum.shareit.booking.BookingRepository;
 import ru.practicum.shareit.booking.dto.BookingShort;
-import ru.practicum.shareit.booking.model.Status;
-import ru.practicum.shareit.exception.IncompatibleUserIdException;
-import ru.practicum.shareit.exception.ItemNotFoundException;
-import ru.practicum.shareit.exception.UserNotBookedBeforeException;
+import ru.practicum.shareit.booking.entity.Status;
+import ru.practicum.shareit.exception.NotFoundException;
+import ru.practicum.shareit.exception.ValidationException;
 import ru.practicum.shareit.item.dto.*;
-import ru.practicum.shareit.item.model.Comment;
-import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.item.entity.Comment;
+import ru.practicum.shareit.item.entity.Item;
+import ru.practicum.shareit.item.mapper.CommentMapper;
+import ru.practicum.shareit.item.mapper.ItemMapper;
 import ru.practicum.shareit.request.RequestService;
 import ru.practicum.shareit.user.UserService;
 import ru.practicum.shareit.util.OffsetBasedPageRequest;
@@ -48,12 +49,12 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public ItemResponse update(long userId, long itemId, CreateItemRequest createItemRequest) {
-        Item item = ItemMapper.toItem(userService.findById(userId), createItemRequest).setId(itemId);
+    public ItemResponse update(long userId, long itemId, UpdateItemRequest updateItemRequest) {
+        Item item = ItemMapper.toItem(userService.findById(userId), updateItemRequest).setId(itemId);
         Item oldItem = findById(itemId);
 
         if (!Objects.equals(item.getOwner().getId(), oldItem.getOwner().getId()))
-            throw new IncompatibleUserIdException("id пользователей не совпадают.");
+            throw new ValidationException("id пользователей не совпадают.");
 
         return ItemMapper.toItemResponse(
                 itemRepository.save(oldItem.setName(item.getName() == null ? oldItem.getName() : item.getName())
@@ -65,7 +66,7 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public Item findById(long itemId) {
         return itemRepository.findById(itemId)
-                .orElseThrow(() -> new ItemNotFoundException(String.format("Предмет с id %s не найден.", itemId)));
+                .orElseThrow(() -> new NotFoundException(String.format("Предмет с id %s не найден.", itemId)));
     }
 
     @Transactional(readOnly = true, propagation = Propagation.REQUIRED)
@@ -107,7 +108,7 @@ public class ItemServiceImpl implements ItemService {
     public CommentResponse saveComment(Long authorId, Long itemId, CreateCommentRequest createCommentRequest) {
         if (bookingRepository.findFirstByBooker_IdAndItem_IdAndStatusAndEndIsBefore(authorId, itemId, Status.APPROVED,
                 LocalDateTime.now()) == null)
-            throw new UserNotBookedBeforeException("Пользователь не может оставить отзыв, " +
+            throw new ValidationException("Пользователь не может оставить отзыв, " +
                     "поскольку не пользовался вещью в прошлом.");
         return CommentMapper.toCommentResponse(commentRepository.save(new Comment()
                 .setText(createCommentRequest.getText())

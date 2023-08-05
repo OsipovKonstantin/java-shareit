@@ -1,12 +1,12 @@
-package ru.practicum.shareit.item;
+package ru.practicum.shareit.item.mapper;
 
 import lombok.experimental.UtilityClass;
 import ru.practicum.shareit.booking.BookingMapper;
 import ru.practicum.shareit.booking.dto.BookingShort;
-import ru.practicum.shareit.booking.model.Booking;
+import ru.practicum.shareit.booking.entity.Booking;
 import ru.practicum.shareit.item.dto.*;
-import ru.practicum.shareit.item.model.Item;
-import ru.practicum.shareit.user.model.User;
+import ru.practicum.shareit.item.entity.Item;
+import ru.practicum.shareit.user.entity.User;
 
 import java.time.LocalDateTime;
 import java.util.Comparator;
@@ -30,14 +30,14 @@ public class ItemMapper {
     public GetItemResponse toGetItemResponse(Item item,
                                              BookingShort lastBooking,
                                              BookingShort nextBooking,
-                                             List<CommentResponse> commentResponse) {
+                                             List<CommentResponse> comments) {
         return new GetItemResponse(item.getId(),
                 item.getName(),
                 item.getDescription(),
                 item.getAvailable(),
                 lastBooking,
                 nextBooking,
-                commentResponse);
+                comments);
     }
 
     public GetItemResponse toGetItemResponse(Item item) {
@@ -59,6 +59,14 @@ public class ItemMapper {
                 .setName(createItemRequest.getName())
                 .setDescription(createItemRequest.getDescription())
                 .setAvailable(createItemRequest.getAvailable())
+                .setOwner(user);
+    }
+
+    public Item toItem(User user, UpdateItemRequest updateItemRequest) {
+        return new Item()
+                .setName(updateItemRequest.getName())
+                .setDescription(updateItemRequest.getDescription())
+                .setAvailable(updateItemRequest.getAvailable())
                 .setOwner(user);
     }
 }

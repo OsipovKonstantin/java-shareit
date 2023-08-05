@@ -3,7 +3,7 @@ package ru.practicum.shareit.request;
 import ru.practicum.shareit.request.dto.CreateRequestRequest;
 import ru.practicum.shareit.request.dto.CreateRequestResponse;
 import ru.practicum.shareit.request.dto.GetRequestResponse;
-import ru.practicum.shareit.request.model.Request;
+import ru.practicum.shareit.request.entity.Request;
 
 import java.util.List;
 

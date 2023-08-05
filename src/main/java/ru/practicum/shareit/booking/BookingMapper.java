@@ -3,16 +3,16 @@ package ru.practicum.shareit.booking;
 import lombok.experimental.UtilityClass;
 import org.springframework.data.projection.ProjectionFactory;
 import org.springframework.data.projection.SpelAwareProxyProjectionFactory;
+import ru.practicum.shareit.booking.dto.BookingResponse;
 import ru.practicum.shareit.booking.dto.BookingShort;
-import ru.practicum.shareit.booking.dto.GetBookingDto;
-import ru.practicum.shareit.booking.model.Booking;
-import ru.practicum.shareit.item.ItemMapper;
-import ru.practicum.shareit.user.UserMapper;
+import ru.practicum.shareit.booking.entity.Booking;
+import ru.practicum.shareit.item.mapper.ItemMapper;
+import ru.practicum.shareit.user.mapper.UserMapper;
 
 @UtilityClass
 public class BookingMapper {
-    public GetBookingDto toGetBookingDto(Booking booking) {
-        return new GetBookingDto(booking.getId(),
+    public BookingResponse toBookingResponse(Booking booking) {
+        return new BookingResponse(booking.getId(),
                 booking.getStart(),
                 booking.getEnd(),
                 booking.getStatus(),

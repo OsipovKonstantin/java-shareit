@@ -2,20 +2,22 @@ package ru.practicum.shareit.request;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import ru.practicum.shareit.exception.RequestNotFoundException;
+import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.request.dto.CreateRequestRequest;
 import ru.practicum.shareit.request.dto.CreateRequestResponse;
 import ru.practicum.shareit.request.dto.GetRequestResponse;
-import ru.practicum.shareit.request.model.Request;
+import ru.practicum.shareit.request.entity.Request;
+import ru.practicum.shareit.request.mapper.RequestMapper;
 import ru.practicum.shareit.user.UserService;
 import ru.practicum.shareit.util.OffsetBasedPageRequest;
 
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static ru.practicum.shareit.util.Constants.SORT_BY_CREATED_DESC;
 
 @Service
 @RequiredArgsConstructor
@@ -35,7 +37,7 @@ public class RequestServiceImpl implements RequestService {
     @Transactional(readOnly = true, propagation = Propagation.REQUIRED)
     @Override
     public Request findById(Long requestId) {
-        return requestRepository.findById(requestId).orElseThrow(() -> new RequestNotFoundException(
+        return requestRepository.findById(requestId).orElseThrow(() -> new NotFoundException(
                 String.format("Запрос с id %d не найден.", requestId)));
     }
 
@@ -50,7 +52,7 @@ public class RequestServiceImpl implements RequestService {
     @Transactional(readOnly = true, propagation = Propagation.REQUIRED)
     @Override
     public List<GetRequestResponse> findRequestsForAnotherRequestors(Long requestorId, Long from, int size) {
-        Pageable page = new OffsetBasedPageRequest(from, size, Sort.by("created").descending());
+        Pageable page = new OffsetBasedPageRequest(from, size, SORT_BY_CREATED_DESC);
         return requestRepository.findByRequestorIdNot(requestorId, page)
                 .stream().map(RequestMapper::toGetRequestResponse).collect(Collectors.toList());
     }

@@ -1,10 +1,10 @@
-package ru.practicum.shareit.item.model;
+package ru.practicum.shareit.item.entity;
 
 import lombok.*;
 import lombok.experimental.Accessors;
-import ru.practicum.shareit.booking.model.Booking;
-import ru.practicum.shareit.request.model.Request;
-import ru.practicum.shareit.user.model.User;
+import ru.practicum.shareit.booking.entity.Booking;
+import ru.practicum.shareit.request.entity.Request;
+import ru.practicum.shareit.user.entity.User;
 
 import javax.persistence.*;
 import java.util.List;

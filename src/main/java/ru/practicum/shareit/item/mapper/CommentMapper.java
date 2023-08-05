@@ -1,10 +1,10 @@
-package ru.practicum.shareit.item;
+package ru.practicum.shareit.item.mapper;
 
 import lombok.experimental.UtilityClass;
 import org.springframework.data.projection.ProjectionFactory;
 import org.springframework.data.projection.SpelAwareProxyProjectionFactory;
 import ru.practicum.shareit.item.dto.CommentResponse;
-import ru.practicum.shareit.item.model.Comment;
+import ru.practicum.shareit.item.entity.Comment;
 
 @UtilityClass
 public class CommentMapper {

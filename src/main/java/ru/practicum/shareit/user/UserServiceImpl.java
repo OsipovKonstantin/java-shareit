@@ -4,9 +4,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import ru.practicum.shareit.exception.UserNotFoundException;
-import ru.practicum.shareit.user.dto.UserDto;
-import ru.practicum.shareit.user.model.User;
+import ru.practicum.shareit.exception.NotFoundException;
+import ru.practicum.shareit.user.dto.CreateUserRequest;
+import ru.practicum.shareit.user.dto.UpdateUserRequest;
+import ru.practicum.shareit.user.dto.UserResponse;
+import ru.practicum.shareit.user.entity.User;
+import ru.practicum.shareit.user.mapper.UserMapper;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -18,35 +21,35 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
 
     @Override
-    public UserDto save(UserDto userDto) {
-        User user = UserMapper.toUser(userDto);
-        return UserMapper.toUserDto(userRepository.save(user));
+    public UserResponse save(CreateUserRequest createUserRequest) {
+        User user = UserMapper.toUser(createUserRequest);
+        return UserMapper.toUserResponse(userRepository.save(user));
     }
 
     @Transactional(readOnly = true, propagation = Propagation.REQUIRED)
     @Override
-    public List<UserDto> findAll() {
-        return userRepository.findAll().stream().map(UserMapper::toUserDto).collect(Collectors.toList());
+    public List<UserResponse> findAll() {
+        return userRepository.findAll().stream().map(UserMapper::toUserResponse).collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true, propagation = Propagation.REQUIRED)
     @Override
-    public UserDto findDtoById(long userId) {
-        return UserMapper.toUserDto(findById(userId));
+    public UserResponse findDtoById(long userId) {
+        return UserMapper.toUserResponse(findById(userId));
     }
 
     @Transactional(readOnly = true, propagation = Propagation.REQUIRED)
     @Override
     public User findById(long userId) {
         return userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException(String.format("Пользователь с id %s не найден.", userId)));
+                .orElseThrow(() -> new NotFoundException(String.format("Пользователь с id %s не найден.", userId)));
     }
 
     @Override
-    public UserDto update(UserDto userDto, long userId) {
-        User user = UserMapper.toUser(userDto.setId(userId));
+    public UserResponse update(UpdateUserRequest updateUserRequest, long userId) {
+        User user = UserMapper.toUser(updateUserRequest).setId(userId);
         User oldUser = findById(userId);
-        return UserMapper.toUserDto(userRepository.save(oldUser
+        return UserMapper.toUserResponse(userRepository.save(oldUser
                 .setName(user.getName() == null ? oldUser.getName() : user.getName())
                 .setEmail(user.getEmail() == null ? oldUser.getEmail() : user.getEmail())));
     }
