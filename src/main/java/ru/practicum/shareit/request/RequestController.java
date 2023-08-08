@@ -40,6 +40,6 @@ public class RequestController {
     @GetMapping("/{requestId}")
     public GetRequestResponse findById(@RequestHeader(USER_ID_IN_REQUEST_HEADER) Long userId,
                                        @PathVariable Long requestId) {
-        return requestService.findById(requestId, userId);
+        return requestService.findDtoById(requestId, userId);
     }
 }

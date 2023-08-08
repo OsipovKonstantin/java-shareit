@@ -18,16 +18,16 @@ public class ItemController {
     private final ItemService itemService;
 
     @PostMapping
-    public ItemResponse saveItem(@RequestHeader(USER_ID_IN_REQUEST_HEADER) long userId,
+    public ItemResponse saveItem(@RequestHeader(USER_ID_IN_REQUEST_HEADER) long ownerId,
                                  @RequestBody @Valid CreateItemRequest createItemRequest) {
-        return itemService.saveItem(userId, createItemRequest);
+        return itemService.saveItem(ownerId, createItemRequest);
     }
 
     @PatchMapping("/{itemId}")
-    public ItemResponse update(@RequestHeader(USER_ID_IN_REQUEST_HEADER) long userId,
+    public ItemResponse update(@RequestHeader(USER_ID_IN_REQUEST_HEADER) long ownerId,
                                @PathVariable long itemId,
                                @RequestBody @Valid UpdateItemRequest updateItemRequest) {
-        return itemService.update(userId, itemId, updateItemRequest);
+        return itemService.update(ownerId, itemId, updateItemRequest);
     }
 
     @GetMapping("/{itemId}")
@@ -37,10 +37,10 @@ public class ItemController {
     }
 
     @GetMapping
-    public List<GetItemResponse> findByOwnerId(@RequestHeader(USER_ID_IN_REQUEST_HEADER) long userId,
+    public List<GetItemResponse> findByOwnerId(@RequestHeader(USER_ID_IN_REQUEST_HEADER) long ownerId,
                                                @RequestParam(defaultValue = "0") @Min(0) @Max(Long.MAX_VALUE) Long from,
                                                @RequestParam(defaultValue = "10") @Min(1) @Max(100) int size) {
-        return itemService.findByOwnerId(userId, from, size);
+        return itemService.findByOwnerId(ownerId, from, size);
     }
 
     @GetMapping("/search")

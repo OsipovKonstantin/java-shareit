@@ -22,6 +22,6 @@ public class RequestMapper {
                 request.getId(),
                 request.getDescription(),
                 request.getCreated(),
-                request.getItems().stream().map(ItemMapper::toItemResponse).collect(Collectors.toList()));
+                request.getItems() == null ? null : request.getItems().stream().map(ItemMapper::toItemResponse).collect(Collectors.toList()));
     }
 }

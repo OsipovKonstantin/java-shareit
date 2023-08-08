@@ -21,7 +21,7 @@ public interface ItemRepository extends JpaRepository<Item, Long> {
             "from Item as i " +
             "join fetch i.owner as ow " +
             "left join fetch i.comments " +
-            "where ow.id=:userId",
-            countQuery = "select count(i) from Item as i where i.owner.id=:userId")
-    Page<Item> findByOwnerId(@Param("userId") long userId, Pageable page);
+            "where ow.id=:ownerId",
+            countQuery = "select count(i) from Item as i where i.owner.id=:ownerId")
+    Page<Item> findByOwnerId(@Param("ownerId") long ownerId, Pageable page);
 }

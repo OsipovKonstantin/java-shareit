@@ -14,6 +14,7 @@ import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.exception.UnknownStateException;
 import ru.practicum.shareit.exception.ValidationException;
 import ru.practicum.shareit.item.ItemService;
+import ru.practicum.shareit.item.entity.Item;
 import ru.practicum.shareit.user.UserService;
 import ru.practicum.shareit.util.OffsetBasedPageRequest;
 
@@ -34,17 +35,18 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public BookingResponse save(Long bookerId, CreateBookingRequest createBookingRequest) {
+
+        Item item = itemService.findById(createBookingRequest.getItemId());
         Booking booking = new Booking()
                 .setStart(createBookingRequest.getStart())
                 .setEnd(createBookingRequest.getEnd())
                 .setStatus(Status.WAITING)
                 .setBooker(userService.findById(bookerId))
-                .setItem(itemService.findById(createBookingRequest.getItemId()));
+                .setItem(item);
 
-        if (Objects.equals(itemService.findById(booking.getItem().getId()).getOwner().getId(),
-                booking.getBooker().getId()))
+        if (Objects.equals(item.getOwner().getId(), bookerId))
             throw new NotFoundException("Создание брони не доступно для владельца предмета.");
-        if (!booking.getItem().getAvailable())
+        if (!item.getAvailable())
             throw new ValidationException("Предмет не доступен для бронирования.");
 
         return BookingMapper.toBookingResponse(bookingRepository.save(booking));
@@ -84,7 +86,7 @@ public class BookingServiceImpl implements BookingService {
         userService.findById(bookerId);
         Page<Booking> bookingPage;
 
-        switch (state) {
+        switch (state.toUpperCase()) {
             case "ALL":
                 bookingPage = bookingRepository.findByBookerIdOrderByStartDesc(bookerId, page);
                 break;
@@ -118,7 +120,7 @@ public class BookingServiceImpl implements BookingService {
         userService.findById(ownerId);
         Page<Booking> bookingPage;
 
-        switch (state) {
+        switch (state.toUpperCase()) {
             case "ALL":
                 bookingPage = bookingRepository.findByItemOwnerId(ownerId, page);
                 break;
@@ -147,7 +149,7 @@ public class BookingServiceImpl implements BookingService {
         return bookingPage.stream().map(BookingMapper::toBookingResponse).collect(Collectors.toList());
     }
 
-    private Booking findById(Long id) {
+    public Booking findById(Long id) {
         return bookingRepository.findById(id).orElseThrow(
                 () -> new NotFoundException(String.format("Бронь с id %d не найдена.", id)));
     }

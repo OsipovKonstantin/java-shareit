@@ -46,7 +46,8 @@ public class RequestServiceImpl implements RequestService {
     public List<GetRequestResponse> findByRequestorId(Long requestorId) {
         userService.findById(requestorId);
         return requestRepository.findByRequestorId(requestorId)
-                .stream().map(RequestMapper::toGetRequestResponse).collect(Collectors.toList());
+                .stream().map(RequestMapper::toGetRequestResponse)
+                .collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true, propagation = Propagation.REQUIRED)
@@ -59,7 +60,7 @@ public class RequestServiceImpl implements RequestService {
 
     @Transactional(readOnly = true, propagation = Propagation.REQUIRED)
     @Override
-    public GetRequestResponse findById(Long requestId, Long userId) {
+    public GetRequestResponse findDtoById(Long requestId, Long userId) {
         userService.findById(userId);
         return RequestMapper.toGetRequestResponse(findById(requestId));
     }

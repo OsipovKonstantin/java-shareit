@@ -16,5 +16,5 @@ public interface RequestService {
 
     List<GetRequestResponse> findRequestsForAnotherRequestors(Long requestorId, Long from, int size);
 
-    GetRequestResponse findById(Long requestId, Long userId);
+    GetRequestResponse findDtoById(Long requestId, Long userId);
 }

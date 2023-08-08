@@ -38,8 +38,8 @@ public class ItemServiceImpl implements ItemService {
     private final RequestService requestService;
 
     @Override
-    public ItemResponse saveItem(long userId, CreateItemRequest createItemRequest) {
-        Item item = ItemMapper.toItem(userService.findById(userId), createItemRequest);
+    public ItemResponse saveItem(long ownerId, CreateItemRequest createItemRequest) {
+        Item item = ItemMapper.toItem(userService.findById(ownerId), createItemRequest);
 
         Long requestId = createItemRequest.getRequestId();
         if (requestId != null)
@@ -49,11 +49,11 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public ItemResponse update(long userId, long itemId, UpdateItemRequest updateItemRequest) {
-        Item item = ItemMapper.toItem(userService.findById(userId), updateItemRequest).setId(itemId);
+    public ItemResponse update(long ownerId, long itemId, UpdateItemRequest updateItemRequest) {
+        Item item = ItemMapper.toItem(userService.findById(ownerId), updateItemRequest).setId(itemId);
         Item oldItem = findById(itemId);
 
-        if (!Objects.equals(item.getOwner().getId(), oldItem.getOwner().getId()))
+        if (!Objects.equals(ownerId, oldItem.getOwner().getId()))
             throw new ValidationException("id пользователей не совпадают.");
 
         return ItemMapper.toItemResponse(
@@ -89,9 +89,9 @@ public class ItemServiceImpl implements ItemService {
 
     @Transactional(readOnly = true, propagation = Propagation.REQUIRED)
     @Override
-    public List<GetItemResponse> findByOwnerId(long userId, Long from, int size) {
+    public List<GetItemResponse> findByOwnerId(long ownerId, Long from, int size) {
         Pageable page = new OffsetBasedPageRequest(from, size);
-        return itemRepository.findByOwnerId(userId, page)
+        return itemRepository.findByOwnerId(ownerId, page)
                 .stream().map(ItemMapper::toGetItemResponse).collect(Collectors.toList());
     }
 
