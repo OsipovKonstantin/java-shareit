@@ -29,7 +29,7 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class RequestServiceImplTest {
+class RequestServiceImplUnitTest {
     private static RequestService requestService;
     private static RequestService requestServiceSpy;
     private static User user;

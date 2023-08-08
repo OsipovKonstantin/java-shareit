@@ -33,7 +33,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class BookingServiceImplTest {
+class BookingServiceImplUnitTest {
 
     private static BookingService bookingService;
     private static BookingService bookingServiceSpy;

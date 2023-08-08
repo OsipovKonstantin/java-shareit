@@ -41,17 +41,23 @@ public class ItemMapper {
     }
 
     public GetItemResponse toGetItemResponse(Item item) {
-        Booking lastBookingNotDto = item.getBookings().stream().filter(b -> b.getStart().isBefore(LocalDateTime.now()))
-                .max(Comparator.comparing(Booking::getStart)).orElse(null);
-        Booking nextBookingNotDto = item.getBookings().stream().filter(b -> b.getStart().isAfter(LocalDateTime.now()))
-                .min(Comparator.comparing(Booking::getStart)).orElse(null);
+        Booking lastBookingNotDto = null;
+        Booking nextBookingNotDto = null;
+
+        if (item.getBookings() != null) {
+            lastBookingNotDto = item.getBookings().stream().filter(b -> b.getStart().isBefore(LocalDateTime.now()))
+                    .max(Comparator.comparing(Booking::getStart)).orElse(null);
+            nextBookingNotDto = item.getBookings().stream().filter(b -> b.getStart().isAfter(LocalDateTime.now()))
+                    .min(Comparator.comparing(Booking::getStart)).orElse(null);
+        }
         return new GetItemResponse(item.getId(),
                 item.getName(),
                 item.getDescription(),
                 item.getAvailable(),
                 lastBookingNotDto == null ? null : BookingMapper.toBookingShort(lastBookingNotDto),
                 nextBookingNotDto == null ? null : BookingMapper.toBookingShort(nextBookingNotDto),
-                item.getComments().stream().map(CommentMapper::toCommentResponse).collect(Collectors.toList()));
+                item.getComments() == null ? null :
+                        item.getComments().stream().map(CommentMapper::toCommentResponse).collect(Collectors.toList()));
     }
 
     public Item toItem(User user, CreateItemRequest createItemRequest) {
