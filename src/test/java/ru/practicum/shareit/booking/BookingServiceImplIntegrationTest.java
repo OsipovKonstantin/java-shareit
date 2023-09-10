@@ -137,7 +137,7 @@ class BookingServiceImplIntegrationTest {
         itemService.saveItem(ownerId, createItemRequest);
         bookingService.save(bookerId, createBookingRequest);
 
-        BookingResponse bookingResponse = bookingService.findByIdAndOwnerOrBookerId(bookingId, ownerId);
+        BookingResponse bookingResponse = bookingService.findByIdAndUserId(bookingId, ownerId);
 
         assertThat(bookingResponse.getId(), equalTo(bookingId));
         assertThat(bookingResponse.getStart(), equalTo(createBookingRequest.getStart()));

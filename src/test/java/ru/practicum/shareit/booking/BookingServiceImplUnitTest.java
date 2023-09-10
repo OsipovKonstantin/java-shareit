@@ -321,7 +321,7 @@ class BookingServiceImplUnitTest {
     void givenCorrectBookingIdAndUserId_whenFindByIdAndUserId_thenReturnBookingDto() {
         doReturn(booking).when(bookingServiceSpy).findById(anyLong());
 
-        BookingResponse newBookingResponse = bookingServiceSpy.findByIdAndOwnerOrBookerId(bookingId,
+        BookingResponse newBookingResponse = bookingServiceSpy.findByIdAndUserId(bookingId,
                 booking.getBooker().getId());
         assertThat(newBookingResponse.getId(), equalTo(booking.getId()));
         assertThat(newBookingResponse.getStart(), equalTo(booking.getStart()));
@@ -331,9 +331,9 @@ class BookingServiceImplUnitTest {
         assertThat(newBookingResponse.getItem().getId(), equalTo(booking.getItem().getId()));
         assertThat(newBookingResponse.getItem().getName(), equalTo(booking.getItem().getName()));
         verify(bookingServiceSpy, times(1)).findById(anyLong());
-        verify(bookingServiceSpy, times(1)).findByIdAndOwnerOrBookerId(anyLong(), anyLong());
+        verify(bookingServiceSpy, times(1)).findByIdAndUserId(anyLong(), anyLong());
 
-        BookingResponse newBookingResponse2 = bookingServiceSpy.findByIdAndOwnerOrBookerId(bookingId,
+        BookingResponse newBookingResponse2 = bookingServiceSpy.findByIdAndUserId(bookingId,
                 booking.getItem().getOwner().getId());
         assertThat(newBookingResponse2.getId(), equalTo(booking.getId()));
         assertThat(newBookingResponse2.getStart(), equalTo(booking.getStart()));
@@ -343,7 +343,7 @@ class BookingServiceImplUnitTest {
         assertThat(newBookingResponse2.getItem().getId(), equalTo(booking.getItem().getId()));
         assertThat(newBookingResponse2.getItem().getName(), equalTo(booking.getItem().getName()));
         verify(bookingServiceSpy, times(2)).findById(anyLong());
-        verify(bookingServiceSpy, times(2)).findByIdAndOwnerOrBookerId(anyLong(), anyLong());
+        verify(bookingServiceSpy, times(2)).findByIdAndUserId(anyLong(), anyLong());
         verifyNoMoreInteractions(itemService, userService, bookingRepository, bookingServiceSpy);
     }
 
@@ -351,10 +351,10 @@ class BookingServiceImplUnitTest {
     void givenNonExistentBookingId_whenFindByIdAndUserId_thenThrowException() {
         doThrow(NotFoundException.class).when(bookingServiceSpy).findById(anyLong());
 
-        assertThrows(NotFoundException.class, () -> bookingServiceSpy.findByIdAndOwnerOrBookerId(99L,
+        assertThrows(NotFoundException.class, () -> bookingServiceSpy.findByIdAndUserId(99L,
                 booking.getBooker().getId()));
         verify(bookingServiceSpy, times(1)).findById(anyLong());
-        verify(bookingServiceSpy, times(1)).findByIdAndOwnerOrBookerId(anyLong(), anyLong());
+        verify(bookingServiceSpy, times(1)).findByIdAndUserId(anyLong(), anyLong());
         verifyNoMoreInteractions(itemService, userService, bookingRepository, bookingServiceSpy);
     }
 
@@ -362,9 +362,9 @@ class BookingServiceImplUnitTest {
     void givenUserIdNotEqualOwnerIdAndBookerId_whenFindByIdAndUserId_thenThrowException() {
         doReturn(booking).when(bookingServiceSpy).findById(anyLong());
 
-        assertThrows(NotFoundException.class, () -> bookingServiceSpy.findByIdAndOwnerOrBookerId(bookingId, user3.getId()));
+        assertThrows(NotFoundException.class, () -> bookingServiceSpy.findByIdAndUserId(bookingId, user3.getId()));
         verify(bookingServiceSpy, times(1)).findById(anyLong());
-        verify(bookingServiceSpy, times(1)).findByIdAndOwnerOrBookerId(anyLong(), anyLong());
+        verify(bookingServiceSpy, times(1)).findByIdAndUserId(anyLong(), anyLong());
         verifyNoMoreInteractions(itemService, userService, bookingRepository, bookingServiceSpy);
     }
 

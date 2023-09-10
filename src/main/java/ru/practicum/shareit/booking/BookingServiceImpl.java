@@ -68,13 +68,13 @@ public class BookingServiceImpl implements BookingService {
 
     @Transactional(readOnly = true, propagation = Propagation.REQUIRED)
     @Override
-    public BookingResponse findByIdAndOwnerOrBookerId(Long bookingId, Long ownerOrBookerId) {
+    public BookingResponse findByIdAndUserId(Long bookingId, Long userId) {
         Booking booking = findById(bookingId);
 
-        if (!Objects.equals(booking.getItem().getOwner().getId(), ownerOrBookerId)
-                && !Objects.equals(booking.getBooker().getId(), ownerOrBookerId))
+        if (!Objects.equals(booking.getItem().getOwner().getId(), userId)
+                && !Objects.equals(booking.getBooker().getId(), userId))
             throw new NotFoundException(String.format("Пользователь с id %d не является владельцем " +
-                    "предмета или бронирующим, поэтому информация о брони недоступна.", ownerOrBookerId));
+                    "предмета или бронирующим, поэтому информация о брони недоступна.", userId));
 
         return BookingMapper.toBookingResponse(booking);
     }

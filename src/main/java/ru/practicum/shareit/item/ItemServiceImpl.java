@@ -57,8 +57,10 @@ public class ItemServiceImpl implements ItemService {
             throw new ValidationException("id пользователей не совпадают.");
 
         return ItemMapper.toItemResponse(
-                itemRepository.save(oldItem.setName(item.getName() == null ? oldItem.getName() : item.getName())
-                        .setDescription(item.getDescription() == null ? oldItem.getDescription() : item.getDescription())
+                itemRepository.save(oldItem.setName(item.getName() == null || item.getName().isBlank() ?
+                                oldItem.getName() : item.getName())
+                        .setDescription(item.getDescription() == null || item.getDescription().isBlank() ?
+                                oldItem.getDescription() : item.getDescription())
                         .setAvailable(item.getAvailable() == null ? oldItem.getAvailable() : item.getAvailable())));
     }
 

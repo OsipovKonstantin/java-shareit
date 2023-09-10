@@ -11,7 +11,7 @@ public interface BookingService {
 
     BookingResponse update(Long bookingId, Long ownerId, boolean approved);
 
-    BookingResponse findByIdAndOwnerOrBookerId(Long bookingId, Long ownerOrBookerId);
+    BookingResponse findByIdAndUserId(Long bookingId, Long ownerOrBookerId);
 
     List<BookingResponse> findByBookerIdAndState(Long bookerId, String state, Long from, int size);
 
