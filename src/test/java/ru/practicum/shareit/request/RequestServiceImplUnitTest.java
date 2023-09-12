@@ -16,7 +16,6 @@ import ru.practicum.shareit.request.entity.Request;
 import ru.practicum.shareit.user.UserService;
 import ru.practicum.shareit.user.entity.User;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -74,9 +73,7 @@ class RequestServiceImplUnitTest {
                 .setId(1L)
                 .setDescription("Дрель ударная 20V")
                 .setRequestor(user3)
-                .setItems(new ArrayList<>() {{
-                    add(item);
-                }});
+                .setItems(List.of(item));
 
         createRequestRequest = new CreateRequestRequest()
                 .setDescription(request.getDescription());
