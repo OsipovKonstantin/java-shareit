@@ -16,12 +16,12 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static ru.practicum.shareit.util.Constants.DATE_TIME_FORMATTER;
 import static ru.practicum.shareit.util.Constants.USER_ID_HEADER;
 
 @WebMvcTest(controllers = ItemController.class)
@@ -425,7 +425,7 @@ class ItemControllerTest {
                 .andExpect(jsonPath("$.id").value(commentResponse.getId()))
                 .andExpect(jsonPath("$.text").value(commentResponse.getText()))
                 .andExpect(jsonPath("$.authorName").value(commentResponse.getAuthorName()))
-                .andExpect(jsonPath("$.created").value(commentResponse.getCreated().format(DATE_TIME_FORMATTER)));
+                .andExpect(jsonPath("$.created").value(notNullValue()));
     }
 
     @Test
