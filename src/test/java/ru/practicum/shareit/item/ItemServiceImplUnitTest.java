@@ -25,7 +25,6 @@ import ru.practicum.shareit.user.UserService;
 import ru.practicum.shareit.user.entity.User;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -115,10 +114,7 @@ class ItemServiceImplUnitTest {
         request = new Request()
                 .setId(1L)
                 .setDescription("Дрель ударная 20V")
-                .setRequestor(user3)
-                .setItems(new ArrayList<>() {{
-                    add(item);
-                }});
+                .setRequestor(user3);
 
         itemName = "Дрель";
         itemDescription = "Ударная 20V";
