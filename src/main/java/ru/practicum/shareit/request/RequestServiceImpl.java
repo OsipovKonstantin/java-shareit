@@ -34,14 +34,14 @@ public class RequestServiceImpl implements RequestService {
         return RequestMapper.toCreateRequestResponse(requestRepository.save(request));
     }
 
-    @Transactional(readOnly = true, propagation = Propagation.REQUIRED)
+    @Transactional(readOnly = true)
     @Override
     public Request findById(Long requestId) {
         return requestRepository.findById(requestId).orElseThrow(() -> new NotFoundException(
                 String.format("Запрос с id %d не найден.", requestId)));
     }
 
-    @Transactional(readOnly = true, propagation = Propagation.REQUIRED)
+    @Transactional(readOnly = true)
     @Override
     public List<GetRequestResponse> findByRequestorId(Long requestorId) {
         userService.findById(requestorId);
@@ -50,7 +50,7 @@ public class RequestServiceImpl implements RequestService {
                 .collect(Collectors.toList());
     }
 
-    @Transactional(readOnly = true, propagation = Propagation.REQUIRED)
+    @Transactional(readOnly = true)
     @Override
     public List<GetRequestResponse> findRequestsForAnotherRequestors(Long requestorId, Long from, int size) {
         Pageable page = new OffsetBasedPageRequest(from, size, SORT_BY_CREATED_DESC);
@@ -58,7 +58,7 @@ public class RequestServiceImpl implements RequestService {
                 .stream().map(RequestMapper::toGetRequestResponse).collect(Collectors.toList());
     }
 
-    @Transactional(readOnly = true, propagation = Propagation.REQUIRED)
+    @Transactional(readOnly = true)
     @Override
     public GetRequestResponse findDtoById(Long requestId, Long userId) {
         userService.findById(userId);

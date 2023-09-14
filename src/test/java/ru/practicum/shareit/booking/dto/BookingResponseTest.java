@@ -1,5 +1,6 @@
 package ru.practicum.shareit.booking.dto;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.json.JsonTest;
@@ -20,6 +21,7 @@ class BookingResponseTest {
     private JacksonTester<BookingResponse> json;
 
     @Test
+    @DisplayName("Протестировать заказ, возвращаемый с сервера на фронтэнд")
     void testBookingResponse() throws Exception {
         BookingResponse bookingResponse = new BookingResponse(1L,
                 LocalDateTime.now(),

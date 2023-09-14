@@ -64,14 +64,14 @@ public class ItemServiceImpl implements ItemService {
                         .setAvailable(item.getAvailable() == null ? oldItem.getAvailable() : item.getAvailable())));
     }
 
-    @Transactional(readOnly = true, propagation = Propagation.REQUIRED)
+    @Transactional(readOnly = true)
     @Override
     public Item findById(long itemId) {
         return itemRepository.findById(itemId)
                 .orElseThrow(() -> new NotFoundException(String.format("Предмет с id %s не найден.", itemId)));
     }
 
-    @Transactional(readOnly = true, propagation = Propagation.REQUIRED)
+    @Transactional(readOnly = true)
     @Override
     public GetItemResponse findDtoById(long itemId, long ownerId) {
         Item item = findById(itemId);
@@ -89,7 +89,7 @@ public class ItemServiceImpl implements ItemService {
         return ItemMapper.toGetItemResponse(item, lastBooking, nextBooking, comments);
     }
 
-    @Transactional(readOnly = true, propagation = Propagation.REQUIRED)
+    @Transactional(readOnly = true)
     @Override
     public List<GetItemResponse> findByOwnerId(long ownerId, Long from, int size) {
         Pageable page = new OffsetBasedPageRequest(from, size);
@@ -97,7 +97,7 @@ public class ItemServiceImpl implements ItemService {
                 .stream().map(ItemMapper::toGetItemResponse).collect(Collectors.toList());
     }
 
-    @Transactional(readOnly = true, propagation = Propagation.REQUIRED)
+    @Transactional(readOnly = true)
     @Override
     public List<ItemResponse> searchAvailableItemsByText(String text, Long from, int size) {
         Pageable page = new OffsetBasedPageRequest(from, size);

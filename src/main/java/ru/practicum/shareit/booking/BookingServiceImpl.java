@@ -66,7 +66,7 @@ public class BookingServiceImpl implements BookingService {
                 bookingRepository.save(oldBooking.setStatus(approved ? Status.APPROVED : Status.REJECTED)));
     }
 
-    @Transactional(readOnly = true, propagation = Propagation.REQUIRED)
+    @Transactional(readOnly = true)
     @Override
     public BookingResponse findByIdAndUserId(Long bookingId, Long userId) {
         Booking booking = findById(bookingId);
@@ -79,7 +79,7 @@ public class BookingServiceImpl implements BookingService {
         return BookingMapper.toBookingResponse(booking);
     }
 
-    @Transactional(readOnly = true, propagation = Propagation.REQUIRED)
+    @Transactional(readOnly = true)
     @Override
     public List<BookingResponse> findByBookerIdAndState(Long bookerId, String state, Long from, int size) {
         Pageable page = new OffsetBasedPageRequest(from, size);
@@ -113,7 +113,7 @@ public class BookingServiceImpl implements BookingService {
         return bookingPage.stream().map(BookingMapper::toBookingResponse).collect(Collectors.toList());
     }
 
-    @Transactional(readOnly = true, propagation = Propagation.REQUIRED)
+    @Transactional(readOnly = true)
     @Override
     public List<BookingResponse> findByItemOwnerIdAndState(Long ownerId, String state, Long from, int size) {
         Pageable page = new OffsetBasedPageRequest(from, size, SORT_BY_START_DESC);

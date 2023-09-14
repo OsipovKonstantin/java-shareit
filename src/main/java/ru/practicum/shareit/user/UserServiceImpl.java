@@ -26,19 +26,19 @@ public class UserServiceImpl implements UserService {
         return UserMapper.toUserResponse(userRepository.save(user));
     }
 
-    @Transactional(readOnly = true, propagation = Propagation.REQUIRED)
+    @Transactional(readOnly = true)
     @Override
     public List<UserResponse> findAll() {
         return userRepository.findAll().stream().map(UserMapper::toUserResponse).collect(Collectors.toList());
     }
 
-    @Transactional(readOnly = true, propagation = Propagation.REQUIRED)
+    @Transactional(readOnly = true)
     @Override
     public UserResponse findDtoById(long userId) {
         return UserMapper.toUserResponse(findById(userId));
     }
 
-    @Transactional(readOnly = true, propagation = Propagation.REQUIRED)
+    @Transactional(readOnly = true)
     @Override
     public User findById(long userId) {
         return userRepository.findById(userId)
