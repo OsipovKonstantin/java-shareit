@@ -1,14 +1,13 @@
 package ru.practicum.shareit.user;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.shareit.user.dto.UserDto;
-import ru.practicum.shareit.validation.CreateGroup;
-import ru.practicum.shareit.validation.UpdateGroup;
+import ru.practicum.shareit.user.dto.CreateUserRequest;
+import ru.practicum.shareit.user.dto.UpdateUserRequest;
+import ru.practicum.shareit.user.dto.UserResponse;
 
+import javax.validation.Valid;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequiredArgsConstructor
@@ -17,23 +16,24 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping
-    public UserDto add(@RequestBody @Validated(CreateGroup.class) UserDto userDto) {
-        return UserMapper.toUserDto(userService.add(UserMapper.toUser(userDto)));
+    public UserResponse save(@RequestBody @Valid CreateUserRequest createUserRequest) {
+        return userService.save(createUserRequest);
     }
 
     @GetMapping
-    public List<UserDto> findAll() {
-        return userService.findAll().stream().map(UserMapper::toUserDto).collect(Collectors.toList());
+    public List<UserResponse> findAll() {
+        return userService.findAll();
     }
 
     @GetMapping("/{userId}")
-    public UserDto findById(@PathVariable long userId) {
-        return UserMapper.toUserDto(userService.findById(userId));
+    public UserResponse findDtoById(@PathVariable long userId) {
+        return userService.findDtoById(userId);
     }
 
     @PatchMapping("/{userId}")
-    public UserDto update(@RequestBody @Validated(UpdateGroup.class) UserDto userDto, @PathVariable long userId) {
-        return UserMapper.toUserDto(userService.update(UserMapper.toUser(userDto.setId(userId))));
+    public UserResponse update(@RequestBody @Valid UpdateUserRequest updateUserRequest,
+                               @PathVariable long userId) {
+        return userService.update(updateUserRequest, userId);
     }
 
     @DeleteMapping("/{userId}")
