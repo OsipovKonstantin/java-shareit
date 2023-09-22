@@ -5,7 +5,7 @@ services:
     image: shareit-gateway-image
     container_name: shareit-gateway-container
     ports:
-      - "8091:8090"
+      - "8071:8070"
     depends_on:
       - server
     environment:
