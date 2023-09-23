@@ -22,7 +22,6 @@ import ru.practicum.shareit.user.UserService;
 import ru.practicum.shareit.util.OffsetBasedPageRequest;
 
 import java.time.LocalDateTime;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -101,8 +100,6 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public List<ItemResponse> searchAvailableItemsByText(String text, Long from, int size) {
         Pageable page = new OffsetBasedPageRequest(from, size);
-        if (text.isBlank())
-            return Collections.emptyList();
         return itemRepository.searchAvailableItemsByText(text, page).toList();
     }
 

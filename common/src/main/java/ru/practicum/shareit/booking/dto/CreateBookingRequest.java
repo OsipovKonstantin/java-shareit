@@ -5,7 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import ru.practicum.shareit.exception.customconstraint.StartBeforeEnd;
 
-import javax.validation.constraints.Future;
+import javax.validation.constraints.FutureOrPresent;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
@@ -19,12 +19,11 @@ public class CreateBookingRequest {
     private Long itemId;
 
     @NotNull
-    @Future
+    @FutureOrPresent
     @JsonFormat(pattern = DATE_TIME_PATTERN)
     private LocalDateTime start;
 
     @NotNull
-    @Future
     @JsonFormat(pattern = DATE_TIME_PATTERN)
     private LocalDateTime end;
 }

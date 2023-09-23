@@ -505,13 +505,6 @@ class ItemServiceImplUnitTest {
     }
 
     @Test
-    void givenBlankText_whenSearchAvailableItemByText_thenReturnEmptyList() {
-        List<ItemResponse> itemResponses = itemService.searchAvailableItemsByText(" ", 0L, 20);
-        assertThat(itemResponses.size(), equalTo(0));
-        verifyNoMoreInteractions(userService, requestService, itemRepository, bookingRepository, commentRepository);
-    }
-
-    @Test
     void givenCorrectAuthorIdAndItemIdAndCommentDto_whenSaveComment_thenReturnCommentDto() {
         Comment newComment = new Comment()
                 .setId(2L)

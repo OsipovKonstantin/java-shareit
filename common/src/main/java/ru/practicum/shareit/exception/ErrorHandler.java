@@ -31,14 +31,14 @@ public class ErrorHandler {
             IllegalStateException.class,
             ConstraintViolationException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse handleValidationException(Exception e) {
+    public ErrorResponse handleValidationException(RuntimeException e) {
         log.debug("{}", e.getMessage());
         return new ErrorResponse("Ошибка валидации.", e.getMessage());
     }
 
     @ExceptionHandler({UnknownStateException.class, IllegalArgumentException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse handleUnknownStateException(Exception e) {
+    public ErrorResponse handleUnknownStateException(RuntimeException e) {
         log.debug("{}", e.getMessage());
         return new ErrorResponse("Unknown state: UNSUPPORTED_STATUS", e.getMessage());
     }
