@@ -137,45 +137,6 @@ class ItemControllerTest {
     }
 
     @Test
-    void givenBlankItemName_whenSaveItem_thenThrowException() throws Exception {
-        createItemRequest.setName("");
-
-        mvc.perform(post("/items")
-                        .header(USER_ID_HEADER, 1L)
-                        .content(mapper.writeValueAsString(createItemRequest))
-                        .characterEncoding(StandardCharsets.UTF_8)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest());
-    }
-
-    @Test
-    void givenBlankItemDescription_whenSaveItem_thenThrowException() throws Exception {
-        createItemRequest.setDescription("");
-
-        mvc.perform(post("/items")
-                        .header(USER_ID_HEADER, 1L)
-                        .content(mapper.writeValueAsString(createItemRequest))
-                        .characterEncoding(StandardCharsets.UTF_8)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest());
-    }
-
-    @Test
-    void givenNullItemAvailable_whenSaveItem_thenThrowException() throws Exception {
-        createItemRequest.setAvailable(null);
-
-        mvc.perform(post("/items")
-                        .header(USER_ID_HEADER, 1L)
-                        .content(mapper.writeValueAsString(createItemRequest))
-                        .characterEncoding(StandardCharsets.UTF_8)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest());
-    }
-
-    @Test
     void givenCorrectItemDtoAndUserIdAndItemId_whenUpdate_thenReturnAnotherItemDto() throws Exception {
         when(itemService.update(anyLong(), anyLong(), any(UpdateItemRequest.class)))
                 .thenReturn(itemResponse);
@@ -286,54 +247,6 @@ class ItemControllerTest {
     }
 
     @Test
-    void givenFromLessThan0_whenFindByOwnerId_thenThrowException() throws Exception {
-        mvc.perform(get("/items")
-                        .header(USER_ID_HEADER, 1L)
-                        .param("from", "-1")
-                        .param("size", "1")
-                        .characterEncoding(StandardCharsets.UTF_8)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest());
-    }
-
-    @Test
-    void givenFromMoreThanMaxOfLong_whenFindByOwnerId_thenThrowException() throws Exception {
-        mvc.perform(get("/items")
-                        .header(USER_ID_HEADER, 1L)
-                        .param("from", String.valueOf(Long.MAX_VALUE + 1))
-                        .param("size", "1")
-                        .characterEncoding(StandardCharsets.UTF_8)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest());
-    }
-
-    @Test
-    void givenSizeLessThan1_whenFindByOwnerId_thenThrowException() throws Exception {
-        mvc.perform(get("/items")
-                        .header(USER_ID_HEADER, 1L)
-                        .param("from", "0")
-                        .param("size", "0")
-                        .characterEncoding(StandardCharsets.UTF_8)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest());
-    }
-
-    @Test
-    void givenSizeMoreThan100_whenFindByOwnerId_thenThrowException() throws Exception {
-        mvc.perform(get("/items")
-                        .header(USER_ID_HEADER, 1L)
-                        .param("from", "0")
-                        .param("size", "101")
-                        .characterEncoding(StandardCharsets.UTF_8)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest());
-    }
-
-    @Test
     void givenCorrectTextWithoutFromAndSize_whenSearchAvailableItemsByText_thenReturnListOfItemDto() throws Exception {
         when(itemService.searchAvailableItemsByText(anyString(), anyLong(), anyInt()))
                 .thenReturn(List.of(itemResponse, itemResponse));
@@ -363,54 +276,6 @@ class ItemControllerTest {
     }
 
     @Test
-    void givenFromLessThan0_whenSearchAvailableItemsByText_thenThrowException() throws Exception {
-        mvc.perform(get("/items/search")
-                        .param("text", "Дрель")
-                        .param("from", "-1")
-                        .param("size", "1")
-                        .characterEncoding(StandardCharsets.UTF_8)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest());
-    }
-
-    @Test
-    void givenFromMoreThanMaxOfLong_whenSearchAvailableItemsByText_thenThrowException() throws Exception {
-        mvc.perform(get("/items/search")
-                        .param("text", "Дрель")
-                        .param("from", String.valueOf(Long.MAX_VALUE + 1))
-                        .param("size", "1")
-                        .characterEncoding(StandardCharsets.UTF_8)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest());
-    }
-
-    @Test
-    void givenSizeLessThan1_whenSearchAvailableItemsByText_thenThrowException() throws Exception {
-        mvc.perform(get("/items/search")
-                        .param("text", "Дрель")
-                        .param("from", "0")
-                        .param("size", "0")
-                        .characterEncoding(StandardCharsets.UTF_8)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest());
-    }
-
-    @Test
-    void givenSizeMoreThan100_whenSearchAvailableItemsByText_thenThrowException() throws Exception {
-        mvc.perform(get("/items/search")
-                        .param("text", "Дрель")
-                        .param("from", "0")
-                        .param("size", "101")
-                        .characterEncoding(StandardCharsets.UTF_8)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest());
-    }
-
-    @Test
     void givenCorrectCommentDtoAndAuthorIdAndItemId_whenSaveComment_thenReturnAnotherCommentDto() throws Exception {
         when(itemService.saveComment(anyLong(), anyLong(), any(CreateCommentRequest.class)))
                 .thenReturn(commentResponse);
@@ -432,17 +297,6 @@ class ItemControllerTest {
     void givenNoUserIdHeader_whenSaveComment_thenThrowException() throws Exception {
         mvc.perform(post("/items/{itemId}/comment", itemId)
                         .content(mapper.writeValueAsString(createCommentRequest))
-                        .characterEncoding(StandardCharsets.UTF_8)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest());
-    }
-
-    @Test
-    void givenBlankText_whenSaveComment_thenThrowException() throws Exception {
-        mvc.perform(post("/items/{itemId}/comment", itemId)
-                        .header(USER_ID_HEADER, 1L)
-                        .content(mapper.writeValueAsString(createCommentRequest.setText("")))
                         .characterEncoding(StandardCharsets.UTF_8)
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))

@@ -7,9 +7,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.dto.BookingResponse;
+import ru.practicum.shareit.booking.dto.BookingState;
 import ru.practicum.shareit.booking.dto.CreateBookingRequest;
 import ru.practicum.shareit.booking.entity.Booking;
 import ru.practicum.shareit.booking.entity.Status;
+import ru.practicum.shareit.booking.mapper.BookingMapper;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.exception.UnknownStateException;
 import ru.practicum.shareit.exception.ValidationException;
@@ -81,12 +83,12 @@ public class BookingServiceImpl implements BookingService {
 
     @Transactional(readOnly = true)
     @Override
-    public List<BookingResponse> findByBookerIdAndState(Long bookerId, String state, Long from, int size) {
+    public List<BookingResponse> findByBookerIdAndState(Long bookerId, BookingState state, Long from, int size) {
         Pageable page = new OffsetBasedPageRequest(from, size);
         userService.findById(bookerId);
         Page<Booking> bookingPage;
 
-        switch (state.toUpperCase()) {
+        switch (state.name()) {
             case "ALL":
                 bookingPage = bookingRepository.findByBookerIdOrderByStartDesc(bookerId, page);
                 break;
@@ -115,12 +117,12 @@ public class BookingServiceImpl implements BookingService {
 
     @Transactional(readOnly = true)
     @Override
-    public List<BookingResponse> findByItemOwnerIdAndState(Long ownerId, String state, Long from, int size) {
+    public List<BookingResponse> findByItemOwnerIdAndState(Long ownerId, BookingState state, Long from, int size) {
         Pageable page = new OffsetBasedPageRequest(from, size, SORT_BY_START_DESC);
         userService.findById(ownerId);
         Page<Booking> bookingPage;
 
-        switch (state.toUpperCase()) {
+        switch (state.name()) {
             case "ALL":
                 bookingPage = bookingRepository.findByItemOwnerId(ownerId, page);
                 break;

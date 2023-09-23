@@ -9,6 +9,7 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.dto.BookingResponse;
+import ru.practicum.shareit.booking.dto.BookingState;
 import ru.practicum.shareit.booking.dto.CreateBookingRequest;
 import ru.practicum.shareit.booking.entity.Booking;
 import ru.practicum.shareit.booking.entity.Status;
@@ -159,7 +160,7 @@ class BookingServiceImplIntegrationTest {
         bookingService.save(bookerId, createBookingRequest);
 
         List<BookingResponse> bookingResponses =
-                bookingService.findByBookerIdAndState(bookerId, "ALL", 0L, 20);
+                bookingService.findByBookerIdAndState(bookerId, BookingState.ALL, 0L, 20);
 
         assertThat(bookingResponses.size(), equalTo(1));
         assertThat(bookingResponses.get(0).getId(), equalTo(bookingId));
@@ -182,7 +183,7 @@ class BookingServiceImplIntegrationTest {
         bookingService.save(bookerId, createBookingRequest);
 
         List<BookingResponse> bookingResponses =
-                bookingService.findByItemOwnerIdAndState(ownerId, "WAITING", 0L, 20);
+                bookingService.findByItemOwnerIdAndState(ownerId, BookingState.WAITING, 0L, 20);
 
         assertThat(bookingResponses.size(), equalTo(1));
         assertThat(bookingResponses.get(0).getId(), equalTo(bookingId));

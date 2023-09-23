@@ -1,4 +1,4 @@
-package ru.practicum.shareit.booking;
+package ru.practicum.shareit.booking.mapper;
 
 import lombok.experimental.UtilityClass;
 import org.springframework.data.projection.ProjectionFactory;

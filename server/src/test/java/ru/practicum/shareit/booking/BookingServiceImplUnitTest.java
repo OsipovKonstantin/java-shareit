@@ -10,11 +10,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import ru.practicum.shareit.booking.dto.BookingResponse;
+import ru.practicum.shareit.booking.dto.BookingState;
 import ru.practicum.shareit.booking.dto.CreateBookingRequest;
 import ru.practicum.shareit.booking.entity.Booking;
 import ru.practicum.shareit.booking.entity.Status;
 import ru.practicum.shareit.exception.NotFoundException;
-import ru.practicum.shareit.exception.UnknownStateException;
 import ru.practicum.shareit.exception.ValidationException;
 import ru.practicum.shareit.item.ItemService;
 import ru.practicum.shareit.item.entity.Item;
@@ -370,7 +370,7 @@ class BookingServiceImplUnitTest {
 
     @Test
     void givenCorrectBookerIdAndStateAll_whenFindByBookerIdAndState_thenReturnListOfBookingDto() {
-        String state = "All";
+        BookingState state = BookingState.ALL;
         Page<Booking> bookingPage = new PageImpl<>(List.of(booking));
 
         when(userService.findById(anyLong()))
@@ -395,7 +395,7 @@ class BookingServiceImplUnitTest {
 
     @Test
     void givenCorrectBookerIdAndStateCurrent_whenFindByBookerIdAndState_thenReturnListOfBookingDto() {
-        String state = "CURRENT";
+        BookingState state = BookingState.CURRENT;
         Page<Booking> bookingPage = new PageImpl<>(List.of(booking));
 
         when(userService.findById(anyLong()))
@@ -423,7 +423,7 @@ class BookingServiceImplUnitTest {
 
     @Test
     void givenCorrectBookerIdAndStatePast_whenFindByBookerIdAndState_thenReturnListOfBookingDto() {
-        String state = "PAST";
+        BookingState state = BookingState.PAST;
         Page<Booking> bookingPage = new PageImpl<>(Collections.emptyList());
 
         when(userService.findById(anyLong()))
@@ -443,7 +443,7 @@ class BookingServiceImplUnitTest {
 
     @Test
     void givenCorrectBookerIdAndStateFuture_whenFindByBookerIdAndState_thenReturnListOfBookingDto() {
-        String state = "FUTURE";
+        BookingState state = BookingState.FUTURE;
         Page<Booking> bookingPage = new PageImpl<>(Collections.emptyList());
 
         when(userService.findById(anyLong()))
@@ -463,7 +463,7 @@ class BookingServiceImplUnitTest {
 
     @Test
     void givenCorrectBookerIdAndStateWaiting_whenFindByBookerIdAndState_thenReturnListOfBookingDto() {
-        String state = "WAITING";
+        BookingState state = BookingState.WAITING;
         Page<Booking> bookingPage = new PageImpl<>(Collections.emptyList());
 
         when(userService.findById(anyLong()))
@@ -483,7 +483,7 @@ class BookingServiceImplUnitTest {
 
     @Test
     void givenCorrectBookerIdAndStateRejected_whenFindByBookerIdAndState_thenReturnListOfBookingDto() {
-        String state = "REJEcTED";
+        BookingState state = BookingState.REJECTED;
         Page<Booking> bookingPage = new PageImpl<>(Collections.emptyList());
 
         when(userService.findById(anyLong()))
@@ -503,7 +503,7 @@ class BookingServiceImplUnitTest {
 
     @Test
     void givenNonExistentBookerId_whenFindByBookerIdAndState_thenThrowException() {
-        String state = "REJECTED";
+        BookingState state = BookingState.REJECTED;
         Page<Booking> bookingPage = new PageImpl<>(Collections.emptyList());
         when(userService.findById(anyLong()))
                 .thenThrow(NotFoundException.class);
@@ -520,21 +520,8 @@ class BookingServiceImplUnitTest {
     }
 
     @Test
-    void givenUnsupportedState_whenFindByBookerIdAndState_thenThrowException() {
-        String state = "ANY";
-        Page<Booking> bookingPage = new PageImpl<>(Collections.emptyList());
-        when(userService.findById(anyLong()))
-                .thenReturn(user2);
-
-        assertThrows(UnknownStateException.class, () ->
-                bookingService.findByBookerIdAndState(booking.getBooker().getId(), state, 0L, 20));
-        verify(userService, times(1)).findById(anyLong());
-        verifyNoMoreInteractions(itemService, userService, bookingRepository);
-    }
-
-    @Test
     void givenCorrectItemOwnerIdAndStateAll_whenFindByItemOwnerIdAndState_thenReturnListOfBookingDto() {
-        String state = "ALL";
+        BookingState state = BookingState.ALL;
         Page<Booking> bookingPage = new PageImpl<>(List.of(booking));
 
         when(userService.findById(anyLong()))
@@ -559,7 +546,7 @@ class BookingServiceImplUnitTest {
 
     @Test
     void givenCorrectItemOwnerIdAndStateCurrent_whenFindByItemOwnerIdAndState_thenReturnListOfBookingDto() {
-        String state = "CURRENT";
+        BookingState state = BookingState.CURRENT;
         Page<Booking> bookingPage = new PageImpl<>(List.of(booking));
 
         when(userService.findById(anyLong()))
@@ -586,7 +573,7 @@ class BookingServiceImplUnitTest {
 
     @Test
     void givenCorrectItemOwnerIdAndStatePast_whenFindByItemOwnerIdAndState_thenReturnListOfBookingDto() {
-        String state = "PAST";
+        BookingState state = BookingState.PAST;
         Page<Booking> bookingPage = new PageImpl<>(Collections.emptyList());
 
         when(userService.findById(anyLong()))
@@ -605,7 +592,7 @@ class BookingServiceImplUnitTest {
 
     @Test
     void givenCorrectItemOwnerIdAndStateFuture_whenFindByItemOwnerIdAndState_thenReturnListOfBookingDto() {
-        String state = "FUTURE";
+        BookingState state = BookingState.FUTURE;
         Page<Booking> bookingPage = new PageImpl<>(Collections.emptyList());
 
         when(userService.findById(anyLong()))
@@ -624,7 +611,7 @@ class BookingServiceImplUnitTest {
 
     @Test
     void givenCorrectItemOwnerIdAndStateWaiting_whenFindByItemOwnerIdAndState_thenReturnListOfBookingDto() {
-        String state = "WAItING";
+        BookingState state = BookingState.WAITING;
         Page<Booking> bookingPage = new PageImpl<>(Collections.emptyList());
 
         when(userService.findById(anyLong()))
@@ -643,7 +630,7 @@ class BookingServiceImplUnitTest {
 
     @Test
     void givenCorrectItemOwnerIdAndStateRejected_whenFindByItemOwnerIdAndState_thenReturnListOfBookingDto() {
-        String state = "REJECTED";
+        BookingState state = BookingState.REJECTED;
         Page<Booking> bookingPage = new PageImpl<>(Collections.emptyList());
 
         when(userService.findById(anyLong()))
@@ -661,20 +648,8 @@ class BookingServiceImplUnitTest {
     }
 
     @Test
-    void givenUnsupportedState_whenFindByItemOwnerIdAndState_thenThrowException() {
-        String state = "SomE";
-        when(userService.findById(anyLong()))
-                .thenReturn(user);
-
-        assertThrows(UnknownStateException.class, () -> bookingService
-                .findByItemOwnerIdAndState(booking.getItem().getOwner().getId(), state, 0L, 20));
-        verify(userService, times(1)).findById(anyLong());
-        verifyNoMoreInteractions(itemService, userService, bookingRepository);
-    }
-
-    @Test
     void givenNonExistentOwnerId_whenFindByItemOwnerIdAndState_thenThrowException() {
-        String state = "CURRENT";
+        BookingState state = BookingState.CURRENT;
         when(userService.findById(anyLong()))
                 .thenThrow(NotFoundException.class);
 

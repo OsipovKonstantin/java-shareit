@@ -8,7 +8,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
-import ru.practicum.shareit.booking.BookingRepository;
 import ru.practicum.shareit.booking.BookingService;
 import ru.practicum.shareit.booking.dto.CreateBookingRequest;
 import ru.practicum.shareit.item.dto.*;
@@ -40,7 +39,6 @@ class ItemServiceImplIntegrationTest {
     private final ItemService itemService;
     private final BookingService bookingService;
     private final RequestService requestService;
-    private final BookingRepository bookingRepository;
 
     private static CreateUserRequest createUserRequest;
     private static CreateUserRequest createUserRequest2;
