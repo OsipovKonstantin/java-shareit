@@ -1,5 +1,5 @@
 ![image](https://github.com/OsipovKonstantin/java-shareit/assets/98541812/0974a421-f97e-45a6-b2d7-ca35f5b85e69)
-# shareIt - приложение шеринга вещей
+# share it - приложение шеринга вещей
 [![Java](https://img.shields.io/badge/-Java-F29111?style=for-the-badge&logo=java&logoColor=e38873)](https://www.oracle.com/java/)
 [![Spring](https://img.shields.io/badge/-Spring-6AAD3D?style=for-the-badge&logo=spring&logoColor=90fd87)](https://spring.io/projects/spring-framework) 
 [![Postgresql](https://img.shields.io/badge/-postgresql-31648C?style=for-the-badge&logo=postgresql&logoColor=FFFFFF)](https://www.postgresql.org/)
