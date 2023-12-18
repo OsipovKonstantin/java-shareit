@@ -30,4 +30,18 @@
 - web-слой. 4 контроллера - 46 тестов с применением фреймворка MockMvc и аннотаций @WebMvcTest и @MockBean
 - слой JPA-репозиториев. 2 репозитория - 4 теста, применяя аннотацию @DataJpaTest
 - слой работы с Json. Для 9 классов DTO проверялась сериализация и десериализация Json, применяя аннотацию @JsonTest
-## Как использовать
+## Как запустить и использовать
+Для запуска необходимо, чтобы на ПК был установлен [Docker Desktop](https://www.docker.com/products/docker-desktop/). Откройте командную строку cmd и выполните следующие команды
+
+   ```
+git clone https://github.com/OsipovKonstantin/java-shareit.git
+   ```
+   ```
+mvn clean package
+   ```
+   ```
+docker-compose up
+   ```
+Приложение готово к использованию! Сервис доступен по андресу [http://localhost:8080](http://localhost:8080)
+
+Со сценариями работы приложения можно ознакомиться, запустив [коллекции Postman-тестов](postman/sprint.json)
